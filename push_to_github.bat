@@ -29,8 +29,8 @@ git remote remove origin >nul 2>&1
 git remote add origin https://github.com/Sxnjxy25/Infrastructure-as-Code-for-Hospital-Management-.git
 
 echo.
-echo [6/6] Pushing to GitHub...
-git push -u origin main
+echo [6/6] Pushing to GitHub (Force Push)...
+git push -u origin main --force
 
 echo.
 echo ===================================================

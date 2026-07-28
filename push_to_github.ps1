@@ -28,8 +28,8 @@ git remote remove origin 2>$null
 git remote add origin https://github.com/Sxnjxy25/Infrastructure-as-Code-for-Hospital-Management-.git
 
 Write-Host ""
-Write-Host "[6/6] Pushing to GitHub..." -ForegroundColor Yellow
-git push -u origin main
+Write-Host "[6/6] Pushing to GitHub (Force Push)..." -ForegroundColor Yellow
+git push -u origin main --force
 
 Write-Host ""
 Write-Host "===================================================" -ForegroundColor Green
