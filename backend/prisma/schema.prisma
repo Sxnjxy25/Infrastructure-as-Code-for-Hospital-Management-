@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  RECEPTIONIST
+  PATIENT
+  PHARMACIST
+  LAB_TECHNICIAN
+  ACCOUNTANT
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  IN_PROGRESS
+}
+
+enum TestStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(PATIENT)
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctor      Doctor?
+  patient     Patient?
+  auditLogs   AuditLog[]
+}
+
+model Patient {
+  id             String   @id @default(uuid())
+  userId         String?  @unique
+  user           User?    @relation(fields: [userId], references: [id])
+  mrn            String   @unique // Medical Record Number
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime
+  gender         String
+  bloodGroup     String?
+  phone          String
+  address        String?
+  emergencyContact String?
+  medicalHistory String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  appointments Appointment[]
+  labTests     LabTest[]
+  invoices     Invoice[]
+}
+
+model Doctor {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  specialization String
+  department     String
+  qualification  String
+  consultationFee Decimal @db.Decimal(10, 2)
+  availability   String   // e.g. "Mon-Fri 09:00-17:00"
+  roomNumber     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  appointments Appointment[]
+}
+
+model Appointment {
+  id            String            @id @default(uuid())
+  patientId     String
+  patient       Patient           @relation(fields: [patientId], references: [id])
+  doctorId      String
+  doctor        Doctor            @relation(fields: [doctorId], references: [id])
+  tokenNumber   Int
+  appointmentDate DateTime
+  reason        String?
+  status        AppointmentStatus @default(SCHEDULED)
+  diagnosis     String?           @db.Text
+  prescription  String?           @db.Text
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model Medicine {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  category    String
+  quantity    Int
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  expiryDate  DateTime
+  supplier    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LabTest {
+  id            String     @id @default(uuid())
+  patientId     String
+  patient       Patient    @relation(fields: [patientId], references: [id])
+  testName      String
+  category      String
+  status        TestStatus @default(PENDING)
+  resultSummary String?    @db.Text
+  reportUrl     String?
+  requestedBy   String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  patientId     String
+  patient       Patient       @relation(fields: [patientId], references: [id])
+  invoiceNumber String        @unique
+  amount        Decimal       @db.Decimal(10, 2)
+  discount      Decimal       @default(0.00) @db.Decimal(10, 2)
+  netAmount     Decimal       @db.Decimal(10, 2)
+  status        InvoiceStatus @default(PENDING)
+  paymentMethod String?
+  description   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  resource  String
+  details   String?  @db.Text
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
