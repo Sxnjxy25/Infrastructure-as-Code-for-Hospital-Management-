@@ -49,10 +49,14 @@ app.use('/api/dashboard', dashboardRoutes);
 // Global Error Handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(` Hospital Management System API Server Running `);
-  console.log(` Port: ${PORT} | Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(` Health Check: http://localhost:${PORT}/api/health`);
-  console.log(`====================================================`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(` Hospital Management System API Server Running `);
+    console.log(` Port: ${PORT} | Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(` Health Check: http://localhost:${PORT}/api/health`);
+    console.log(`====================================================`);
+  });
+}
+
+module.exports = app;
