@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  staff       StaffProfile[]
+}
+
+model User {
+  id                  String         @id @default(uuid())
+  email               String         @unique
+  password            String
+  name                String
+  role                String         @default("PATIENT")
+  phone               String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  doctor              Doctor?
+  patient             Patient?
+  staffProfile        StaffProfile?
+  createdAppointments Appointment[]  @relation("AppointmentCreator")
+  receivedPayments    Payment[]      @relation("PaymentReceiver")
+  notifications       Notification[]
+  auditLogs           AuditLog[]
+}
+
+model StaffProfile {
+  id                String          @id @default(uuid())
+  userId            String?         @unique
+  user              User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  departmentId      String?
+  department        Department?     @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  name              String
+  category          String          // DOCTOR, PHARMACIST, LAB_TECHNICIAN, ACCOUNTANT, NURSE, TECHNICAL_STAFF, CLEANER
+  designation       String
+  shift             String?         // MORNING, EVENING, NIGHT, ROTATIONAL
+  availability      String          @default("AVAILABLE") // AVAILABLE, ON_DUTY, BUSY, OFF_DUTY, ON_LEAVE
+  phone             String?
+  email             String?
+  profilePictureUrl String?
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  documents         StaffDocument[]
+}
+
+model StaffDocument {
+  id             String       @id @default(uuid())
+  staffProfileId String
+  staffProfile   StaffProfile @relation(fields: [staffProfileId], references: [id], onDelete: Cascade)
+  documentType   String       // CERTIFICATE, IDENTITY, CONTRACT, OTHER
+  title          String
+  fileUrl        String       // S3 Key or storage reference path
+  fileName       String
+  fileSize       Int
+  mimeType       String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Patient {
+  id               String        @id @default(uuid())
+  userId           String?       @unique
+  user             User?         @relation(fields: [userId], references: [id])
+  mrn              String        @unique // Medical Record Number
+  firstName        String
+  lastName         String
+  dateOfBirth      DateTime
+  gender           String
+  bloodGroup       String?
+  phone            String
+  address          String?
+  emergencyContact String?
+  medicalHistory   String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  appointments     Appointment[]
+  labTests         LabTest[]
+  invoices         Invoice[]
+}
+
+model Doctor {
+  id              String        @id @default(uuid())
+  userId          String        @unique
+  user            User          @relation(fields: [userId], references: [id])
+  specialization  String
+  department      String
+  qualification   String
+  consultationFee Float
+  availability    String        @default("AVAILABLE") // AVAILABLE, ON_DUTY, BUSY, OFF_DUTY, ON_LEAVE
+  roomNumber      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  appointments    Appointment[]
+}
+
+model Appointment {
+  id              String   @id @default(uuid())
+  patientId       String
+  patient         Patient  @relation(fields: [patientId], references: [id])
+  doctorId        String
+  doctor          Doctor   @relation(fields: [doctorId], references: [id])
+  createdById     String?
+  createdBy       User?    @relation("AppointmentCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  tokenNumber     Int
+  appointmentDate DateTime
+  channel         String   @default("OFFLINE") // OFFLINE (Walk-in), ONLINE
+  reason          String?
+  status          String   @default("SCHEDULED") // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+  diagnosis       String?
+  prescription    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Medicine {
+  id               String        @id @default(uuid())
+  code             String        @unique
+  name             String
+  category         String
+  quantity         Int
+  unitPrice        Float
+  reorderThreshold Int           @default(20)
+  expiryDate       DateTime
+  supplier         String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  dispensedItems   InvoiceItem[]
+}
+
+model LabTest {
+  id            String   @id @default(uuid())
+  patientId     String
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  testName      String
+  category      String
+  cost          Float    @default(50.00)
+  status        String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, CANCELLED
+  resultSummary String?
+  reportUrl     String?
+  requestedBy   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  patientId     String
+  patient       Patient       @relation(fields: [patientId], references: [id])
+  invoiceNumber String        @unique
+  billingType   String        @default("RECEPTION") // RECEPTION, PHARMACY, COMBINED
+  amount        Float
+  discount      Float         @default(0.00)
+  netAmount     Float
+  paidAmount    Float         @default(0.00)
+  status        String        @default("PENDING") // PENDING, PARTIALLY_PAID, PAID, CANCELLED, REFUNDED
+  paymentMethod String?
+  description   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  items         InvoiceItem[]
+  payments      Payment[]
+}
+
+model InvoiceItem {
+  id               String    @id @default(uuid())
+  invoiceId        String
+  invoice          Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  sourceDepartment String    // RECEPTION, PHARMACY, LABORATORY, CLINICAL
+  billingType      String    // CONSULTATION, MEDICINE, LAB_TEST, ADMISSION, SERVICE
+  itemDescription  String
+  quantity         Int       @default(1)
+  unitPrice        Float
+  totalPrice       Float
+  medicineId       String?
+  medicine         Medicine? @relation(fields: [medicineId], references: [id], onDelete: SetNull)
+  sourceEntity     String?   // APPOINTMENT, LAB_TEST, PHARMACY_SALE
+  sourceId         String?   // Unique ID of source event for IDEMPOTENCY
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([sourceEntity, sourceId], name: "source_item_unique")
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  invoiceId     String
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  receiptNumber String   @unique
+  amount        Float
+  paymentMethod String   // CASH, UPI, CARD, ONLINE_PAYMENT
+  transactionId String?
+  status        String   @default("COMPLETED") // COMPLETED, REFUNDED, FAILED
+  notes         String?
+  receivedById  String?
+  receivedBy    User?    @relation("PaymentReceiver", fields: [receivedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  role      String?  // Target role (ADMIN, DOCTOR, RECEPTIONIST, PHARMACIST, LAB_TECHNICIAN, ACCOUNTANT) or null
+  userId    String?  // Target specific user ID or null for role-wide
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   // LOW_STOCK, OUT_OF_STOCK, LAB_REQUEST, LAB_RESULT, APPOINTMENT, PAYMENT, GENERAL
+  entityId  String?  // Resource ID
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  resource  String
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,40 @@
+services:
+  # ─── Backend REST API ──────────────────────────────────────────────────────
+  - type: web
+    name: hms-backend-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hms-postgres
+          property: connectionString
+
+  # ─── Frontend React UI ─────────────────────────────────────────────────────
+  - type: web
+    name: hms-frontend-ui
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    dockerBuildArgs:
+      - key: VITE_API_URL
+        sync: false   # Set this manually in Render dashboard to your backend URL
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+
+# ─── PostgreSQL Database ──────────────────────────────────────────────────────
+databases:
+  - name: hms-postgres
+    plan: free
+    databaseName: hospital_db
+    user: hms_admin
