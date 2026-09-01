@@ -396,8 +396,8 @@ const executeMockFallback = (config = {}) => {
   // Billing
   if (url.includes('/billing')) {
     if (url.includes('/revenue')) {
-      const totalPaid = MOCK_STORE.invoices.reduce((sum, inv) => sum + (inv.paidAmount || 0), 0);
-      const totalNet = MOCK_STORE.invoices.reduce((sum, inv) => sum + (inv.netAmount || 0), 0);
+      const totalPaid = MOCK_STORE.invoices.reduce((sum, inv) => sum + (Number(inv.paidAmount) || 0), 0);
+      const totalNet = MOCK_STORE.invoices.reduce((sum, inv) => sum + (Number(inv.netAmount) || 0), 0);
       return Promise.resolve({
         data: {
           success: true,
@@ -411,13 +411,14 @@ const executeMockFallback = (config = {}) => {
         }
       });
     }
-    if (url.includes('/payments')) {
+
+    if (url.includes('/payments') && method === 'post') {
       const invId = url.split('/billing/invoices/')[1]?.split('/')[0];
       const inv = MOCK_STORE.invoices.find(i => i.id === invId);
       const pmtAmount = parseFloat(postData.amount || 0);
       const recNum = `REC-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       if (inv) {
-        inv.paidAmount = (inv.paidAmount || 0) + pmtAmount;
+        inv.paidAmount = (Number(inv.paidAmount) || 0) + pmtAmount;
         inv.status = inv.paidAmount >= inv.netAmount ? 'PAID' : 'PARTIALLY_PAID';
         inv.paymentMethod = postData.paymentMethod || 'UPI';
         if (!inv.payments) inv.payments = [];
@@ -437,6 +438,48 @@ const executeMockFallback = (config = {}) => {
         }
       });
     }
+
+    if (method === 'post' && !url.includes('/payments')) {
+      const gross = parseFloat(postData.amount || 1000);
+      const disc = parseFloat(postData.discount || 0);
+      const net = Math.max(0, gross - disc);
+      const newInv = {
+        id: `inv-${Date.now()}`,
+        invoiceNumber: `INV-2026-${String(MOCK_STORE.invoices.length + 1).padStart(4, '0')}`,
+        billingType: postData.billingType || 'RECEPTION',
+        amount: gross,
+        discount: disc,
+        netAmount: net,
+        paidAmount: 0.00,
+        status: 'PENDING',
+        paymentMethod: null,
+        description: postData.description || 'Hospital Outpatient Services',
+        patient: MOCK_STORE.patients.find(p => p.id === postData.patientId) || MOCK_STORE.patients[0],
+        items: [
+          {
+            id: `itm-${Date.now()}`,
+            sourceDepartment: postData.billingType || 'CLINICAL',
+            billingType: 'SERVICE',
+            itemDescription: postData.description || 'Hospital Service Line Item',
+            quantity: 1,
+            unitPrice: gross,
+            totalPrice: gross
+          }
+        ],
+        payments: []
+      };
+      MOCK_STORE.invoices.unshift(newInv);
+      return Promise.resolve({ data: { success: true, data: newInv, message: 'Invoice generated successfully' } });
+    }
+
+    if (url.includes('/reception')) {
+      return Promise.resolve({ data: { success: true, data: MOCK_STORE.invoices.filter(i => i.billingType === 'RECEPTION') } });
+    }
+
+    if (url.includes('/pharmacy')) {
+      return Promise.resolve({ data: { success: true, data: MOCK_STORE.invoices.filter(i => i.billingType === 'PHARMACY') } });
+    }
+
     return Promise.resolve({ data: { success: true, data: [...MOCK_STORE.invoices] } });
   }
 
