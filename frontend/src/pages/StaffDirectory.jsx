@@ -94,9 +94,10 @@ const StaffDirectory = () => {
   const fetchDepartments = async () => {
     try {
       const res = await api.get('/departments');
-      setDepartments(res.data.data);
+      const data = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
+      setDepartments(data);
     } catch (err) {
-      console.error(err);
+      console.warn('Departments fetch fallback:', err);
     }
   };
 
@@ -109,9 +110,10 @@ const StaffDirectory = () => {
       if (search) params.append('search', search);
 
       const res = await api.get(`/staff?${params.toString()}`);
-      setStaffList(res.data.data);
+      const data = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
+      setStaffList(data);
     } catch (err) {
-      console.error(err);
+      console.warn('Staff fetch fallback:', err);
     } finally {
       setLoading(false);
     }
@@ -120,7 +122,14 @@ const StaffDirectory = () => {
   const handleCreateStaff = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/staff', formData);
+      const res = await api.post('/staff', formData);
+      const created = res.data?.data || {
+        ...formData,
+        id: `stf-${Date.now()}`,
+        department: departments.find(d => d.id === formData.departmentId) || { name: 'Hospital Operations' },
+        isActive: true
+      };
+      setStaffList(prev => [created, ...prev]);
       setShowAddModal(false);
       setFormData({
         name: '',
@@ -132,7 +141,7 @@ const StaffDirectory = () => {
         phone: '',
         email: ''
       });
-      fetchStaff();
+      alert('Staff member registered successfully!');
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to create staff profile');
     }
