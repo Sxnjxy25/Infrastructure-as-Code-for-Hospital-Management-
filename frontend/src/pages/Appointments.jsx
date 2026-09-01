@@ -170,7 +170,7 @@ const Appointments = () => {
             </tr>
           </thead>
           <tbody>
-            {apps.map((app) => (
+            {apps?.map((app) => (
               <tr key={app.id}>
                 <td>
                   <span
@@ -189,10 +189,10 @@ const Appointments = () => {
                 </td>
                 <td>
                   <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
-                    {app.patient.firstName} {app.patient.lastName}
+                    {app.patient?.firstName} {app.patient?.lastName}
                   </div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                    MRN: {app.patient.mrn} • Ph: {app.patient.phone}
+                    MRN: {app.patient?.mrn || 'N/A'} • Ph: {app.patient?.phone || 'N/A'}
                   </div>
                 </td>
                 <td>
@@ -410,7 +410,7 @@ const Appointments = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedAllAppointments.map((app) => (
+              {sortedAllAppointments?.map((app) => (
                 <tr key={app.id}>
                   <td>
                     <span className="user-badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.3)' }}>
@@ -418,10 +418,10 @@ const Appointments = () => {
                     </span>
                   </td>
                   <td>
-                    <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{app.patient.firstName} {app.patient.lastName}</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>MRN: {app.patient.mrn}</div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{app.patient?.firstName} {app.patient?.lastName}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>MRN: {app.patient?.mrn || 'N/A'}</div>
                   </td>
-                  <td style={{ color: 'var(--text-secondary)' }}>{app.doctor.user.name} ({app.doctor.specialization})</td>
+                  <td style={{ color: 'var(--text-secondary)' }}>{app.doctor?.user?.name || 'Assigned Doctor'} ({app.doctor?.specialization || 'General'})</td>
                   <td>
                     <span className="user-badge" style={{ background: app.channel === 'ONLINE' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(2, 132, 199, 0.2)', color: app.channel === 'ONLINE' ? '#a78bfa' : '#38bdf8' }}>
                       {app.channel === 'ONLINE' ? <Globe size={12} style={{ display: 'inline', marginRight: 3 }} /> : <MapPin size={12} style={{ display: 'inline', marginRight: 3 }} />}
@@ -473,14 +473,14 @@ const Appointments = () => {
                 <label>Select Patient</label>
                 <select className="form-control" required onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}>
                   <option value="">-- Choose Patient --</option>
-                  {patients.map(p => <option key={p.id} value={p.id}>{p.firstName} {p.lastName} ({p.mrn})</option>)}
+                  {patients?.map(p => <option key={p.id} value={p.id}>{p.firstName} {p.lastName} ({p.mrn})</option>)}
                 </select>
               </div>
               <div className="form-group">
                 <label>Select Attending Doctor</label>
                 <select className="form-control" required onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}>
                   <option value="">-- Choose Doctor --</option>
-                  {doctors.map(d => <option key={d.id} value={d.id}>{d.user.name} ({d.specialization}) - Fee: ${d.consultationFee}</option>)}
+                  {doctors?.map(d => <option key={d.id} value={d.id}>{d.user?.name || 'Doctor'} ({d.specialization}) - Fee: ${d.consultationFee}</option>)}
                 </select>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -531,7 +531,7 @@ const Appointments = () => {
               <div>
                 <h3 style={{ margin: 0, fontFamily: 'Outfit, sans-serif', fontWeight: 800 }}>Clinical Visit Completion</h3>
                 <div style={{ fontSize: '0.88rem', color: '#38bdf8', marginTop: '3px' }}>
-                  Patient: {completeAppModal.patient.firstName} {completeAppModal.patient.lastName} ({completeAppModal.patient.mrn})
+                  Patient: {completeAppModal.patient?.firstName} {completeAppModal.patient?.lastName} ({completeAppModal.patient?.mrn || 'N/A'})
                 </div>
               </div>
               <button onClick={() => setCompleteAppModal(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
@@ -569,7 +569,7 @@ const Appointments = () => {
                   <TestTube size={16} /> Order Diagnostic Investigations (Routes to Lab)
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
-                  {COMMON_LAB_TESTS.map((test) => {
+                  {COMMON_LAB_TESTS?.map((test) => {
                     const isSelected = completeFormData.selectedTests.some(t => t.testName === test.testName);
                     return (
                       <div

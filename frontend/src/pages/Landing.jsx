@@ -578,7 +578,7 @@ const Landing = () => {
           </div>
 
           {/* Square 2 & Square 3: Doctor Details Cards */}
-          {doctorsList.map((doc, idx) => {
+          {doctorsList?.map((doc, idx) => {
             const BadgeIcon = doc.badgeIcon;
             return (
               <div key={idx} className="editorial-card">
@@ -844,7 +844,7 @@ const Landing = () => {
                         if (found) setSelectedDoctor(found);
                       }}
                     >
-                      {doctorsList.map((d, i) => (
+                      {doctorsList?.map((d, i) => (
                         <option key={i} value={d.name}>
                           {d.name} — {d.department} (Fee: ₹{d.consultationFee.toFixed(2)})
                         </option>
@@ -923,7 +923,7 @@ const Landing = () => {
                   <div className="form-group">
                     <label>Available Consultation Slots</label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.35rem' }}>
-                      {availableTimeSlots.map((slot, sIdx) => (
+                      {availableTimeSlots?.map((slot, sIdx) => (
                         <button
                           key={sIdx}
                           type="button"

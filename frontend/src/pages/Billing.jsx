@@ -128,7 +128,7 @@ const Billing = () => {
           { id: 'RECEPTION', label: 'Reception & Hospital Bills' },
           { id: 'PHARMACY', label: 'Pharmacy Sales Bills' },
           { id: 'REVENUE', label: 'Department Revenue Analytics' }
-        ].map((tab) => (
+        ]?.map((tab) => (
           <button
             key={tab.id}
             className={`filter-chip ${activeTab === tab.id ? 'active' : ''}`}
@@ -196,14 +196,14 @@ const Billing = () => {
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((inv) => {
+                {invoices?.map((inv) => {
                   const balanceDue = inv.netAmount - (inv.paidAmount || 0);
                   return (
                     <tr key={inv.id}>
                       <td><span className="user-badge">{inv.invoiceNumber}</span></td>
                       <td>
-                        <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{inv.patient.firstName} {inv.patient.lastName}</div>
-                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>MRN: {inv.patient.mrn}</div>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{inv.patient?.firstName || 'Patient'} {inv.patient?.lastName || ''}</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>MRN: {inv.patient?.mrn || 'N/A'}</div>
                       </td>
                       <td>
                         <span className="user-badge" style={{ background: inv.billingType === 'PHARMACY' ? 'rgba(2, 132, 199, 0.2)' : 'rgba(16, 185, 129, 0.2)', color: inv.billingType === 'PHARMACY' ? '#38bdf8' : '#34d399' }}>
@@ -260,7 +260,7 @@ const Billing = () => {
               <div>
                 <h3 style={{ margin: 0, fontFamily: 'Outfit, sans-serif', fontWeight: 800 }}>Invoice: {selectedInvoice.invoiceNumber}</h3>
                 <div style={{ fontSize: '0.88rem', color: '#38bdf8', marginTop: '3px' }}>
-                  Patient: {selectedInvoice.patient.firstName} {selectedInvoice.patient.lastName} ({selectedInvoice.patient.mrn})
+                  Patient: {selectedInvoice.patient?.firstName || 'Patient'} {selectedInvoice.patient?.lastName || ''} ({selectedInvoice.patient?.mrn || 'N/A'})
                 </div>
               </div>
               <button onClick={() => setSelectedInvoice(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
@@ -312,7 +312,7 @@ const Billing = () => {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                  {selectedInvoice.payments.map((p) => (
+                  {selectedInvoice.payments?.map((p) => (
                     <div
                       key={p.id}
                       style={{

@@ -40,7 +40,7 @@ const Navbar = () => {
     e.stopPropagation();
     try {
       await api.patch(`/notifications/${id}/read`);
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+      setNotifications(prev => prev?.map(n => n.id === id ? { ...n, isRead: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (err) {
       console.error(err);
@@ -50,7 +50,7 @@ const Navbar = () => {
   const handleMarkAllRead = async () => {
     try {
       await api.patch('/notifications/read-all');
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setNotifications(prev => prev?.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
     } catch (err) {
       console.error(err);
@@ -176,7 +176,7 @@ const Navbar = () => {
                     No alerts in queue.
                   </div>
                 ) : (
-                  notifications.map((n) => (
+                  notifications?.map((n) => (
                     <div
                       key={n.id}
                       style={{

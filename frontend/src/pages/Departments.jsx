@@ -77,7 +77,7 @@ const Departments = () => {
               </tr>
             </thead>
             <tbody>
-              {departments.map((dept) => (
+              {departments?.map((dept) => (
                 <tr key={dept.id}>
                   <td><span className="user-badge">{dept.code}</span></td>
                   <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{dept.name}</td>

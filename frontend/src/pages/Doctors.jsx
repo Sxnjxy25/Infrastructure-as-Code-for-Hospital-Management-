@@ -23,14 +23,14 @@ const Doctors = () => {
       <h2 style={{ marginBottom: '1.5rem', fontWeight: 800 }}>Medical Staff & Specialist Directory</h2>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-        {doctors.map((doc) => (
+        {doctors?.map((doc) => (
           <div key={doc.id} className="glass-card">
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
               <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <UserCheck size={24} />
               </div>
               <div>
-                <h4 style={{ margin: 0, fontSize: '1.1rem' }}>{doc.user.name}</h4>
+                <h4 style={{ margin: 0, fontSize: '1.1rem' }}>{doc.user?.name || 'Dr. Specialist'}</h4>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: '#0284c7', fontWeight: 600 }}>{doc.specialization}</p>
               </div>
             </div>

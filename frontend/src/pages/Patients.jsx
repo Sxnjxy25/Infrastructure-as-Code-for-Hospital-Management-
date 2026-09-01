@@ -78,7 +78,7 @@ const Patients = () => {
             </tr>
           </thead>
           <tbody>
-            {patients.map((p) => (
+            {patients?.map((p) => (
               <tr key={p.id}>
                 <td><span className="user-badge">{p.mrn}</span></td>
                 <td style={{ fontWeight: 600 }}>{p.firstName} {p.lastName}</td>

@@ -141,7 +141,7 @@ const StaffDirectory = () => {
   const handleUpdateAvailability = async (staffId, availability) => {
     try {
       await api.patch(`/staff/${staffId}/availability`, { availability });
-      setStaffList(prev => prev.map(s => s.id === staffId ? { ...s, availability } : s));
+      setStaffList(prev => prev?.map(s => s.id === staffId ? { ...s, availability } : s));
       if (selectedStaff?.id === staffId) {
         setSelectedStaff(prev => ({ ...prev, availability }));
       }
@@ -263,7 +263,7 @@ const StaffDirectory = () => {
 
       {/* Interactive Category Filter Chips */}
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
-        {CATEGORIES.map((cat) => {
+        {CATEGORIES?.map((cat) => {
           const Icon = cat.icon;
           const isActive = categoryFilter === cat.value;
           return (
@@ -302,7 +302,7 @@ const StaffDirectory = () => {
               value={availabilityFilter}
               onChange={(e) => setAvailabilityFilter(e.target.value)}
             >
-              {AVAILABILITY_OPTIONS.map(a => (
+              {AVAILABILITY_OPTIONS?.map(a => (
                 <option key={a.value} value={a.value}>{a.label}</option>
               ))}
             </select>
@@ -336,7 +336,7 @@ const StaffDirectory = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredStaffList.map((s) => (
+              {filteredStaffList?.map((s) => (
                 <tr key={s.id}>
                   <td>
                     <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{s.name || s.user?.name || 'Staff Member'}</div>
@@ -366,7 +366,7 @@ const StaffDirectory = () => {
                         value={s.availability}
                         onChange={(e) => handleUpdateAvailability(s.id, e.target.value)}
                       >
-                        {AVAILABILITY_OPTIONS.filter(o => o.value !== '').map(o => (
+                        {AVAILABILITY_OPTIONS.filter(o => o.value !== '')?.map(o => (
                           <option key={o.value} value={o.value}>{o.label}</option>
                         ))}
                       </select>
@@ -457,7 +457,7 @@ const StaffDirectory = () => {
                     onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
                   >
                     <option value="">-- Select Department --</option>
-                    {departments.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
+                    {departments?.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
                   </select>
                 </div>
               </div>
@@ -571,7 +571,7 @@ const StaffDirectory = () => {
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                      {selectedStaff.documents.map((doc) => (
+                      {selectedStaff.documents?.map((doc) => (
                         <div
                           key={doc.id}
                           style={{

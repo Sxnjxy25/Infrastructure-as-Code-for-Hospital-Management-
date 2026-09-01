@@ -199,7 +199,7 @@ const Pharmacy = () => {
               </tr>
             </thead>
             <tbody>
-              {medicines.map((med) => (
+              {medicines?.map((med) => (
                 <tr key={med.id}>
                   <td><span className="user-badge">{med.code}</span></td>
                   <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{med.name}</td>
@@ -348,7 +348,7 @@ const Pharmacy = () => {
                   onChange={(e) => setDispensePatientId(e.target.value)}
                 >
                   <option value="">-- Choose Patient (MRN) --</option>
-                  {patients.map(p => <option key={p.id} value={p.id}>{p.firstName} {p.lastName} ({p.mrn})</option>)}
+                  {patients?.map(p => <option key={p.id} value={p.id}>{p.firstName} {p.lastName} ({p.mrn})</option>)}
                 </select>
               </div>
 
@@ -364,7 +364,7 @@ const Pharmacy = () => {
                   </button>
                 </div>
 
-                {dispenseItems.map((item, idx) => (
+                {dispenseItems?.map((item, idx) => (
                   <div key={idx} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr auto', gap: '0.6rem', marginBottom: '0.6rem', alignItems: 'center' }}>
                     <select
                       className="form-control"
@@ -373,7 +373,7 @@ const Pharmacy = () => {
                       onChange={(e) => handleDispenseItemChange(idx, 'medicineId', e.target.value)}
                     >
                       <option value="">-- Select Medicine --</option>
-                      {medicines.map(m => (
+                      {medicines?.map(m => (
                         <option key={m.id} value={m.id} disabled={m.quantity === 0}>
                           {m.name} (${Number(m.unitPrice).toFixed(2)}) - {m.quantity} in stock {m.quantity === 0 ? '[OUT OF STOCK]' : ''}
                         </option>

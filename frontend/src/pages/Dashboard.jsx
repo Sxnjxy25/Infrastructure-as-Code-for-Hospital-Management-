@@ -83,7 +83,7 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {apps.map((app) => (
+            {apps?.map((app) => (
               <tr key={app.id}>
                 <td>
                   <span
@@ -360,11 +360,11 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {sortedAllAppointments.map((app) => (
+                {sortedAllAppointments?.map((app) => (
                   <tr key={app.id}>
                     <td><span className="user-badge">#{app.tokenNumber}</span></td>
-                    <td style={{ fontWeight: 600 }}>{app.doctor.user.name} ({app.doctor.specialization})</td>
-                    <td>{app.patient.firstName} {app.patient.lastName} ({app.patient.mrn})</td>
+                    <td style={{ fontWeight: 600 }}>{app.doctor?.user?.name || 'Assigned Doctor'} ({app.doctor?.specialization || 'General'})</td>
+                    <td>{app.patient?.firstName} {app.patient?.lastName} ({app.patient?.mrn || 'N/A'})</td>
                     <td>
                       <span className="user-badge" style={{ background: app.channel === 'ONLINE' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(2, 132, 199, 0.2)', color: app.channel === 'ONLINE' ? '#a78bfa' : '#38bdf8' }}>
                         {app.channel || 'OFFLINE'}

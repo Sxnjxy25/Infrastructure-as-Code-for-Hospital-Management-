@@ -18,7 +18,7 @@ exports.getLabTests = async (req, res, next) => {
         include: { appointments: { select: { patientId: true } } }
       });
       if (doctor) {
-        const patientIds = [...new Set(doctor.appointments.map(a => a.patientId))];
+        const patientIds = [...new Set(doctor.appointments?.map(a => a.patientId))];
         where.patientId = { in: patientIds };
       }
     } else if (req.user.role === 'PATIENT') {

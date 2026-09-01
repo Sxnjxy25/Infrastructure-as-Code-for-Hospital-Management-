@@ -41,7 +41,7 @@ const Sidebar = () => {
         </div>
       </Link>
       <ul className="sidebar-menu">
-        {filteredNav.map((item) => {
+        {filteredNav?.map((item) => {
           const Icon = item.icon;
           return (
             <li key={item.path}>

@@ -129,7 +129,7 @@ const Laboratory = () => {
           { id: 'PENDING', label: 'Pending Requests' },
           { id: 'PROCESSING', label: 'In Processing' },
           { id: 'COMPLETED', label: 'Completed Reports' }
-        ].map((tab) => (
+        ]?.map((tab) => (
           <button
             key={tab.id}
             className={`filter-chip ${statusFilter === tab.id ? 'active' : ''}`}
@@ -162,11 +162,11 @@ const Laboratory = () => {
               </tr>
             </thead>
             <tbody>
-              {tests.map((t) => (
+              {tests?.map((t) => (
                 <tr key={t.id}>
                   <td>
-                    <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t.patient.firstName} {t.patient.lastName}</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>MRN: {t.patient.mrn}</div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t.patient?.firstName || 'Patient'} {t.patient?.lastName || ''}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>MRN: {t.patient?.mrn || 'N/A'}</div>
                   </td>
                   <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t.testName}</td>
                   <td><span className="user-badge">{t.category}</span></td>
@@ -230,7 +230,7 @@ const Laboratory = () => {
                 <label>Select Patient</label>
                 <select className="form-control" required onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}>
                   <option value="">-- Choose Patient --</option>
-                  {patients.map(p => <option key={p.id} value={p.id}>{p.firstName} {p.lastName} ({p.mrn})</option>)}
+                  {patients?.map(p => <option key={p.id} value={p.id}>{p.firstName} {p.lastName} ({p.mrn})</option>)}
                 </select>
               </div>
               <div className="form-group">
@@ -299,7 +299,7 @@ const Laboratory = () => {
               <div>
                 <h3 style={{ margin: 0, fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Enter Diagnostic Findings</h3>
                 <div style={{ fontSize: '0.85rem', color: '#f43f5e', marginTop: '2px' }}>
-                  {completeModalTest.testName} • Patient: {completeModalTest.patient.firstName} {completeModalTest.patient.lastName}
+                  {completeModalTest.testName} • Patient: {completeModalTest.patient?.firstName || 'Patient'} {completeModalTest.patient?.lastName || ''}
                 </div>
               </div>
               <button onClick={() => setCompleteModalTest(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
