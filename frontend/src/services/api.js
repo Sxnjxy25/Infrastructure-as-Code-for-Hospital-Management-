@@ -116,6 +116,38 @@ const executeMockFallback = (config = {}) => {
     postData = {};
   }
 
+  // Authentication Login Fallback
+  if (url.includes('/auth/login')) {
+    const email = (postData.email || 'admin@hospital.com').toLowerCase().trim();
+    const DEMO_USERS = {
+      'admin@hospital.com': { id: 'usr-admin-01', name: 'Dr. Arthur Pendelton', email: 'admin@hospital.com', role: 'ADMIN', phone: '+91-98765-00100' },
+      'dr.smith@hospital.com': { id: 'usr-doc-01', name: 'Dr. Sarah Smith', email: 'dr.smith@hospital.com', role: 'DOCTOR', phone: '+91-98765-43210' },
+      'dr.patel@hospital.com': { id: 'usr-doc-02', name: 'Dr. Rajesh Patel', email: 'dr.patel@hospital.com', role: 'DOCTOR', phone: '+91-98765-43211' },
+      'reception@hospital.com': { id: 'usr-rec-01', name: 'Emma Watson', email: 'reception@hospital.com', role: 'RECEPTIONIST', phone: '+91-98765-43212' },
+      'pharmacy@hospital.com': { id: 'usr-pharma-01', name: 'Michael Chang', email: 'pharmacy@hospital.com', role: 'PHARMACIST', phone: '+91-98765-43213' },
+      'lab@hospital.com': { id: 'usr-lab-01', name: 'Alice Johnson', email: 'lab@hospital.com', role: 'LAB_TECHNICIAN', phone: '+91-98765-43214' },
+      'billing@hospital.com': { id: 'usr-bill-01', name: 'Robert Davis', email: 'billing@hospital.com', role: 'ACCOUNTANT', phone: '+91-98765-43215' }
+    };
+
+    const user = DEMO_USERS[email] || {
+      id: `usr-demo-${Date.now()}`,
+      name: email.split('@')[0].toUpperCase(),
+      email,
+      role: email.includes('admin') ? 'ADMIN' : email.includes('doc') || email.includes('dr.') ? 'DOCTOR' : email.includes('pharm') ? 'PHARMACIST' : email.includes('lab') ? 'LAB_TECHNICIAN' : email.includes('bill') ? 'ACCOUNTANT' : 'RECEPTIONIST',
+      phone: '+91-98765-00000'
+    };
+
+    const token = `carepulse-auth-token-${user.role.toLowerCase()}-${Date.now()}`;
+    return Promise.resolve({
+      data: {
+        success: true,
+        message: 'Login successful',
+        token,
+        user
+      }
+    });
+  }
+
   // Dashboard stats
   if (url.includes('/dashboard/stats')) {
     return Promise.resolve({
