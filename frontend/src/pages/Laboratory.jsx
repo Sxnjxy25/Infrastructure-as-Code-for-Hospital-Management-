@@ -72,7 +72,7 @@ const Laboratory = () => {
     patientId: '',
     testName: '',
     category: 'Hematology',
-    cost: 50.00,
+    cost: 450.00,
     requestedBy: ''
   });
 

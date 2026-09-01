@@ -30,14 +30,14 @@ const DEFAULT_DOCTORS = [
     specialization: 'Cardiology',
     department: 'Cardiovascular Services',
     qualification: 'MD, FACC, Board Certified Cardiologist',
-    consultationFee: 150.0,
+    consultationFee: 1500.0,
     availability: 'AVAILABLE',
     roomNumber: 'Suite 302',
     user: {
       id: 'usr-doc-01',
       name: 'Dr. Sarah Smith',
       email: 'dr.smith@hospital.com',
-      phone: '+1-555-0102'
+      phone: '+91-98765-43210'
     }
   },
   {
@@ -45,14 +45,14 @@ const DEFAULT_DOCTORS = [
     specialization: 'Neurology',
     department: 'Neurological Sciences',
     qualification: 'MBBS, MD Neurology, Fellow AAN',
-    consultationFee: 175.0,
+    consultationFee: 1750.0,
     availability: 'AVAILABLE',
     roomNumber: 'Suite 410',
     user: {
       id: 'usr-doc-02',
       name: 'Dr. Rajesh Patel',
       email: 'dr.patel@hospital.com',
-      phone: '+1-555-0108'
+      phone: '+91-98765-43211'
     }
   },
   {
@@ -60,14 +60,14 @@ const DEFAULT_DOCTORS = [
     specialization: 'Pediatrics',
     department: 'Pediatrics & Child Care',
     qualification: 'MD Pediatrics, FAAP Specialist',
-    consultationFee: 130.0,
+    consultationFee: 1200.0,
     availability: 'ON_DUTY',
     roomNumber: 'Suite 204',
     user: {
       id: 'usr-doc-03',
       name: 'Dr. Emily Taylor',
       email: 'dr.taylor@hospital.com',
-      phone: '+1-555-0112'
+      phone: '+91-98765-43220'
     }
   },
   {
@@ -75,14 +75,14 @@ const DEFAULT_DOCTORS = [
     specialization: 'Orthopedics',
     department: 'Orthopedic Surgery & Trauma',
     qualification: 'MS Orthopedics, Joint Replacement Surgeon',
-    consultationFee: 190.0,
+    consultationFee: 1800.0,
     availability: 'AVAILABLE',
     roomNumber: 'Suite 501',
     user: {
       id: 'usr-doc-04',
       name: 'Dr. Marcus Vance',
       email: 'dr.vance@hospital.com',
-      phone: '+1-555-0115'
+      phone: '+91-98765-43221'
     }
   },
   {
@@ -90,14 +90,14 @@ const DEFAULT_DOCTORS = [
     specialization: 'General Medicine',
     department: 'Internal & General Medicine',
     qualification: 'MD Internal Medicine',
-    consultationFee: 110.0,
+    consultationFee: 1000.0,
     availability: 'AVAILABLE',
     roomNumber: 'Suite 105',
     user: {
       id: 'usr-doc-05',
       name: 'Dr. Alan Harper',
       email: 'dr.harper@hospital.com',
-      phone: '+1-555-0118'
+      phone: '+91-98765-43222'
     }
   }
 ];
@@ -142,7 +142,7 @@ const Doctors = () => {
     specialization: 'Cardiology',
     department: 'Cardiovascular Services',
     qualification: '',
-    consultationFee: 150,
+    consultationFee: 1500,
     roomNumber: 'Suite 300',
     availability: 'AVAILABLE'
   });
@@ -354,7 +354,7 @@ const Doctors = () => {
           </div>
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Consultation Rates</div>
-            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fbbf24' }}>$110 - $190</div>
+            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fbbf24' }}>₹1,000 - ₹1,800</div>
           </div>
         </div>
       </div>
@@ -596,7 +596,7 @@ const Doctors = () => {
                 <div>
                   <h3 style={{ margin: 0, fontFamily: 'Outfit, sans-serif', fontWeight: 800 }}>Schedule Consultation Slot</h3>
                   <div style={{ fontSize: '0.85rem', color: '#38bdf8', marginTop: '2px' }}>
-                    {bookingDoctor.user?.name || 'Dr. Specialist'} • {bookingDoctor.specialization} (${bookingDoctor.consultationFee})
+                    {bookingDoctor.user?.name || 'Dr. Specialist'} • {bookingDoctor.specialization} (₹{Number(bookingDoctor.consultationFee || 1500).toFixed(2)})
                   </div>
                 </div>
               </div>
@@ -793,7 +793,7 @@ const Doctors = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Consultation Fee ($)</label>
+                  <label>Consultation Fee (₹)</label>
                   <input
                     type="number"
                     step="0.01"

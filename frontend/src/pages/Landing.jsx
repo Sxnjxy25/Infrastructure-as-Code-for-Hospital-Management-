@@ -43,8 +43,8 @@ const doctorsList = [
     qualification: 'MD, FACC, Board Certified',
     department: 'Cardiovascular Services',
     roomNumber: 'Suite 302 (3rd Floor)',
-    phone: '+1-555-0102',
-    consultationFee: 150.00,
+    phone: '+91-98765-43210',
+    consultationFee: 1500.00,
     schedule: 'Mon - Fri • 09:00 AM - 04:00 PM',
     image: card1Img,
     badge: 'Cardiology Dept',
@@ -59,8 +59,8 @@ const doctorsList = [
     qualification: 'MBBS, MD Neurology',
     department: 'Neurology & Brain Sciences',
     roomNumber: 'Suite 410 (4th Floor)',
-    phone: '+1-555-0108',
-    consultationFee: 175.00,
+    phone: '+91-98765-43211',
+    consultationFee: 1750.00,
     schedule: 'Mon - Sat • 10:00 AM - 05:00 PM',
     image: card2Img,
     badge: 'Neurology Dept',
@@ -362,7 +362,7 @@ const Landing = () => {
             <div>
               <div class="info-item-label">Mode & Consultation Fee</div>
               <div class="info-item-value">${confirmedBooking.channel === 'OFFLINE' ? 'In-Person (Clinic Room)' : 'Online Video Consultation'}</div>
-              <div class="info-item-sub">Fee: ₹${Number(confirmedBooking.consultationFee || 150).toFixed(2)} (Pay at Counter)</div>
+              <div class="info-item-sub">Fee: ₹${Number(confirmedBooking.consultationFee || 1500).toFixed(2)} (Pay at Counter)</div>
             </div>
           </div>
 

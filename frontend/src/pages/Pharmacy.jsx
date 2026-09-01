@@ -17,12 +17,12 @@ import {
 } from 'lucide-react';
 
 const DEFAULT_MEDICINES = [
-  { id: 'med-01', name: 'Amlodipine 5mg', code: 'MED-AMLO-5', category: 'Cardiovascular', quantity: 248, unitPrice: 12.50, reorderThreshold: 50, expiryDate: '2027-12-31', supplier: 'CardioPharma' },
-  { id: 'med-02', name: 'Amoxicillin 500mg', code: 'MED-AMOX-500', category: 'Antibiotics', quantity: 12, unitPrice: 18.00, reorderThreshold: 25, expiryDate: '2026-11-30', supplier: 'Apex Labs' },
-  { id: 'med-03', name: 'Paracetamol 650mg', code: 'MED-PARA-650', category: 'Analgesics', quantity: 0, unitPrice: 5.00, reorderThreshold: 40, expiryDate: '2027-06-30', supplier: 'MediCorp' },
-  { id: 'med-04', name: 'Atorvastatin 10mg', code: 'MED-ATOR-10', category: 'Cardiovascular', quantity: 180, unitPrice: 22.00, reorderThreshold: 30, expiryDate: '2028-01-15', supplier: 'CardioPharma' },
-  { id: 'med-05', name: 'Metformin 500mg', code: 'MED-METF-500', category: 'Endocrine', quantity: 300, unitPrice: 8.50, reorderThreshold: 50, expiryDate: '2027-08-20', supplier: 'DiabetesCare' },
-  { id: 'med-06', name: 'Omeprazole 20mg', code: 'MED-OMEP-20', category: 'Gastrointestinal', quantity: 15, unitPrice: 14.00, reorderThreshold: 20, expiryDate: '2026-10-31', supplier: 'GastroHealth' }
+  { id: 'med-01', name: 'Amlodipine 5mg', code: 'MED-AMLO-5', category: 'Cardiovascular', quantity: 248, unitPrice: 125.00, reorderThreshold: 50, expiryDate: '2027-12-31', supplier: 'CardioPharma' },
+  { id: 'med-02', name: 'Amoxicillin 500mg', code: 'MED-AMOX-500', category: 'Antibiotics', quantity: 12, unitPrice: 180.00, reorderThreshold: 25, expiryDate: '2026-11-30', supplier: 'Apex Labs' },
+  { id: 'med-03', name: 'Paracetamol 650mg', code: 'MED-PARA-650', category: 'Analgesics', quantity: 0, unitPrice: 50.00, reorderThreshold: 40, expiryDate: '2027-06-30', supplier: 'MediCorp' },
+  { id: 'med-04', name: 'Atorvastatin 10mg', code: 'MED-ATOR-10', category: 'Cardiovascular', quantity: 180, unitPrice: 220.00, reorderThreshold: 30, expiryDate: '2028-01-15', supplier: 'CardioPharma' },
+  { id: 'med-05', name: 'Metformin 500mg', code: 'MED-METF-500', category: 'Endocrine', quantity: 300, unitPrice: 85.00, reorderThreshold: 50, expiryDate: '2027-08-20', supplier: 'DiabetesCare' },
+  { id: 'med-06', name: 'Omeprazole 20mg', code: 'MED-OMEP-20', category: 'Gastrointestinal', quantity: 15, unitPrice: 140.00, reorderThreshold: 20, expiryDate: '2026-10-31', supplier: 'GastroHealth' }
 ];
 
 const DEFAULT_PATIENTS = [
@@ -49,7 +49,7 @@ const Pharmacy = () => {
     name: '',
     category: 'Cardiovascular',
     quantity: 50,
-    unitPrice: 10.00,
+    unitPrice: 100.00,
     reorderThreshold: 25,
     expiryDate: '2028-12-31',
     supplier: ''

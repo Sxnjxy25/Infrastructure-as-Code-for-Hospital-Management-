@@ -483,6 +483,28 @@ const executeMockFallback = (config = {}) => {
     return Promise.resolve({ data: { success: true, data: [...MOCK_STORE.invoices] } });
   }
 
+  // Notifications
+  if (url.includes('/notifications')) {
+    if (url.includes('/read-all')) {
+      MOCK_STORE.notifications.forEach(n => { n.isRead = true; });
+      return Promise.resolve({ data: { success: true, message: 'All marked as read' } });
+    }
+    if (url.includes('/read') || method === 'patch') {
+      const notifId = url.split('/notifications/')[1]?.split('/')[0];
+      const notif = MOCK_STORE.notifications.find(n => n.id === notifId);
+      if (notif) notif.isRead = true;
+      return Promise.resolve({ data: { success: true, message: 'Marked as read' } });
+    }
+    const unreadCount = MOCK_STORE.notifications.filter(n => !n.isRead).length;
+    return Promise.resolve({
+      data: {
+        success: true,
+        data: [...MOCK_STORE.notifications],
+        unreadCount
+      }
+    });
+  }
+
   // Generic fallback
   return Promise.resolve({ data: { success: true, data: [] } });
 };
