@@ -15,10 +15,27 @@ const DEMO_ACCOUNTS = {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      console.warn('Invalid user in localStorage, clearing auth cache:', e);
+      try {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      } catch (err) {
+        // ignore
+      }
+      return null;
+    }
   });
-  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
+  const [token, setToken] = useState(() => {
+    try {
+      return localStorage.getItem('token') || null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(false);
 
   const login = async (email, password) => {

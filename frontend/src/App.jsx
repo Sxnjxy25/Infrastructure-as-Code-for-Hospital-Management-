@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -18,7 +19,7 @@ import Pharmacy from './pages/Pharmacy';
 import Laboratory from './pages/Laboratory';
 import Billing from './pages/Billing';
 
-const AppLayout = () => {
+const AppLayout = ({ children }) => {
   const { token } = useContext(AuthContext);
 
   if (!token) {
@@ -31,18 +32,7 @@ const AppLayout = () => {
       <div className="main-content">
         <Navbar />
         <div className="content-container">
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/departments" element={<ProtectedRoute allowedRoles={['ADMIN']}><Departments /></ProtectedRoute>} />
-            <Route path="/staff" element={<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'ACCOUNTANT', 'PHARMACIST', 'LAB_TECHNICIAN']}><StaffDirectory /></ProtectedRoute>} />
-            <Route path="/patients" element={<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'ACCOUNTANT']}><Patients /></ProtectedRoute>} />
-            <Route path="/doctors" element={<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'PATIENT']}><Doctors /></ProtectedRoute>} />
-            <Route path="/appointments" element={<ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'PATIENT']}><Appointments /></ProtectedRoute>} />
-            <Route path="/pharmacy" element={<ProtectedRoute allowedRoles={['ADMIN', 'PHARMACIST', 'DOCTOR']}><Pharmacy /></ProtectedRoute>} />
-            <Route path="/lab" element={<ProtectedRoute allowedRoles={['ADMIN', 'LAB_TECHNICIAN', 'DOCTOR', 'PATIENT']}><Laboratory /></ProtectedRoute>} />
-            <Route path="/billing" element={<ProtectedRoute allowedRoles={['ADMIN', 'ACCOUNTANT', 'RECEPTIONIST', 'PATIENT']}><Billing /></ProtectedRoute>} />
-          </Routes>
+          {children}
         </div>
       </div>
     </div>
@@ -51,18 +41,113 @@ const AppLayout = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/*" element={<AppLayout />} />
-          </Routes>
-        </Router>
-      </ToastProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ToastProvider>
+          <Router>
+            <Routes>
+              {/* Public Showcase & Authentication Routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/landing" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+
+              {/* Protected Clinical App Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <AppLayout>
+                    <Dashboard />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/departments"
+                element={
+                  <AppLayout>
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                      <Departments />
+                    </ProtectedRoute>
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/staff"
+                element={
+                  <AppLayout>
+                    <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'ACCOUNTANT', 'PHARMACIST', 'LAB_TECHNICIAN']}>
+                      <StaffDirectory />
+                    </ProtectedRoute>
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/patients"
+                element={
+                  <AppLayout>
+                    <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'ACCOUNTANT']}>
+                      <Patients />
+                    </ProtectedRoute>
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/doctors"
+                element={
+                  <AppLayout>
+                    <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'PATIENT']}>
+                      <Doctors />
+                    </ProtectedRoute>
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/appointments"
+                element={
+                  <AppLayout>
+                    <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'PATIENT']}>
+                      <Appointments />
+                    </ProtectedRoute>
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/pharmacy"
+                element={
+                  <AppLayout>
+                    <ProtectedRoute allowedRoles={['ADMIN', 'PHARMACIST', 'DOCTOR']}>
+                      <Pharmacy />
+                    </ProtectedRoute>
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/lab"
+                element={
+                  <AppLayout>
+                    <ProtectedRoute allowedRoles={['ADMIN', 'LAB_TECHNICIAN', 'DOCTOR', 'PATIENT']}>
+                      <Laboratory />
+                    </ProtectedRoute>
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/billing"
+                element={
+                  <AppLayout>
+                    <ProtectedRoute allowedRoles={['ADMIN', 'ACCOUNTANT', 'RECEPTIONIST', 'PATIENT']}>
+                      <Billing />
+                    </ProtectedRoute>
+                  </AppLayout>
+                }
+              />
+
+              {/* Catch-all Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Router>
+        </ToastProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
