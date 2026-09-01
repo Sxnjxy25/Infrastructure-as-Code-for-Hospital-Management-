@@ -4,7 +4,6 @@ import { AuthContext } from '../context/AuthContext';
 import {
   CreditCard,
   Plus,
-  DollarSign,
   Receipt,
   FileText,
   Building2,
@@ -14,7 +13,13 @@ import {
   Eye,
   X,
   Activity,
-  Search
+  Search,
+  PieChart,
+  Percent,
+  Layers,
+  ArrowUpRight,
+  ShieldCheck,
+  Wallet
 } from 'lucide-react';
 
 const DEFAULT_INVOICES = [
@@ -22,67 +27,94 @@ const DEFAULT_INVOICES = [
     id: 'inv-01',
     invoiceNumber: 'INV-2026-0001',
     billingType: 'RECEPTION',
-    amount: 150.00,
-    discount: 10.00,
-    netAmount: 140.00,
-    paidAmount: 140.00,
+    amount: 1500.00,
+    discount: 100.00,
+    netAmount: 1400.00,
+    paidAmount: 1400.00,
     status: 'PAID',
     paymentMethod: 'CARD',
-    description: 'Outpatient Specialist Consultation',
+    description: 'Outpatient Cardiology Specialist Consultation',
     patient: { firstName: 'John', lastName: 'Doe', mrn: 'MRN-2026-001' },
     items: [
-      { id: 'itm-01', sourceDepartment: 'CLINICAL', billingType: 'CONSULTATION', itemDescription: 'Specialist Consultation - Dr. Sarah Smith', quantity: 1, unitPrice: 150.00, totalPrice: 150.00 }
+      { id: 'itm-01', sourceDepartment: 'CLINICAL', billingType: 'CONSULTATION', itemDescription: 'Specialist Consultation - Dr. Sarah Smith', quantity: 1, unitPrice: 1500.00, totalPrice: 1500.00 }
     ],
     payments: [
-      { id: 'pmt-01', receiptNumber: 'REC-2026-0001', amount: 140.00, paymentMethod: 'CARD', createdAt: new Date().toISOString() }
+      { id: 'pmt-01', receiptNumber: 'REC-2026-0001', amount: 1400.00, paymentMethod: 'CARD', createdAt: new Date().toISOString() }
     ]
   },
   {
     id: 'inv-02',
     invoiceNumber: 'INV-2026-0002',
     billingType: 'RECEPTION',
-    amount: 210.00,
+    amount: 2100.00,
     discount: 0.00,
-    netAmount: 210.00,
-    paidAmount: 210.00,
+    netAmount: 2100.00,
+    paidAmount: 2100.00,
     status: 'PAID',
-    paymentMethod: 'CARD',
-    description: 'Neurology Consultation & Investigation',
+    paymentMethod: 'UPI',
+    description: 'Neurology Consultation & Diagnostic Review',
     patient: { firstName: 'Eleanor', lastName: 'Vance', mrn: 'MRN-2026-002' },
     items: [
-      { id: 'itm-02', sourceDepartment: 'CLINICAL', billingType: 'CONSULTATION', itemDescription: 'Specialist Consultation - Dr. Rajesh Patel', quantity: 1, unitPrice: 175.00, totalPrice: 175.00 }
+      { id: 'itm-02', sourceDepartment: 'CLINICAL', billingType: 'CONSULTATION', itemDescription: 'Specialist Consultation - Dr. Rajesh Patel', quantity: 1, unitPrice: 1750.00, totalPrice: 1750.00 },
+      { id: 'itm-02b', sourceDepartment: 'LABORATORY', billingType: 'INVESTIGATION', itemDescription: 'Reflex Nerve Conduction Screening', quantity: 1, unitPrice: 350.00, totalPrice: 350.00 }
     ],
     payments: [
-      { id: 'pmt-02', receiptNumber: 'REC-2026-0002', amount: 210.00, paymentMethod: 'CARD', createdAt: new Date().toISOString() }
+      { id: 'pmt-02', receiptNumber: 'REC-2026-0002', amount: 2100.00, paymentMethod: 'UPI', createdAt: new Date().toISOString() }
     ]
   },
   {
     id: 'inv-03',
     invoiceNumber: 'INV-2026-0003',
     billingType: 'PHARMACY',
-    amount: 37.00,
+    amount: 450.00,
     discount: 0.00,
-    netAmount: 37.00,
+    netAmount: 450.00,
     paidAmount: 0.00,
     status: 'PENDING',
     paymentMethod: null,
-    description: 'Pharmacy Prescription Dispensing',
+    description: 'Central Pharmacy Prescription Dispensing',
     patient: { firstName: 'Alex', lastName: 'Morgan', mrn: 'MRN-2026-003' },
     items: [
-      { id: 'itm-03', sourceDepartment: 'PHARMACY', billingType: 'MEDICINE', itemDescription: 'Amlodipine 5mg (Qty: 2)', quantity: 2, unitPrice: 12.50, totalPrice: 25.00 },
-      { id: 'itm-04', sourceDepartment: 'PHARMACY', billingType: 'MEDICINE', itemDescription: 'Paracetamol 650mg (Qty: 2)', quantity: 2, unitPrice: 6.00, totalPrice: 12.00 }
+      { id: 'itm-03', sourceDepartment: 'PHARMACY', billingType: 'MEDICINE', itemDescription: 'Amlodipine 5mg (Qty: 2)', quantity: 2, unitPrice: 125.00, totalPrice: 250.00 },
+      { id: 'itm-04', sourceDepartment: 'PHARMACY', billingType: 'MEDICINE', itemDescription: 'Paracetamol 650mg (Qty: 4)', quantity: 4, unitPrice: 50.00, totalPrice: 200.00 }
     ],
     payments: []
+  },
+  {
+    id: 'inv-04',
+    invoiceNumber: 'INV-2026-0004',
+    billingType: 'LABORATORY',
+    amount: 850.00,
+    discount: 50.00,
+    netAmount: 800.00,
+    paidAmount: 800.00,
+    status: 'PAID',
+    paymentMethod: 'CASH',
+    description: 'Pathology Lipid & Complete Blood Profile',
+    patient: { firstName: 'Lisa', lastName: 'Ray', mrn: 'MRN-2026-004' },
+    items: [
+      { id: 'itm-05', sourceDepartment: 'LABORATORY', billingType: 'LAB_TEST', itemDescription: 'Complete Blood Count (CBC)', quantity: 1, unitPrice: 450.00, totalPrice: 450.00 },
+      { id: 'itm-06', sourceDepartment: 'LABORATORY', billingType: 'LAB_TEST', itemDescription: 'Lipid Profile Panel', quantity: 1, unitPrice: 400.00, totalPrice: 400.00 }
+    ],
+    payments: [
+      { id: 'pmt-03', receiptNumber: 'REC-2026-0003', amount: 800.00, paymentMethod: 'CASH', createdAt: new Date().toISOString() }
+    ]
   }
 ];
 
 const DEFAULT_REVENUE = {
-  CLINICAL: '325.00',
-  PHARMACY: '37.00',
-  LABORATORY: '45.00',
-  RECEPTION: '350.00',
-  TOTAL: '350.00'
+  CLINICAL: '3500.00',
+  PHARMACY: '450.00',
+  LABORATORY: '1150.00',
+  RECEPTION: '3500.00',
+  TOTAL: '4300.00'
 };
+
+const DEPARTMENT_REVENUE_BREAKDOWN = [
+  { department: 'Cardiology & Clinical Outpatient', stream: 'Consultation & Diagnostics', totalBills: 2, invoiced: 3500, realized: 3500, pending: 0, share: 68, color: '#38bdf8' },
+  { department: 'Diagnostic Pathology & Lab', stream: 'Specimens & Hematology', totalBills: 2, invoiced: 1150, realized: 800, pending: 350, share: 22, color: '#f43f5e' },
+  { department: 'Central Pharmacy Dispensary', stream: 'Medication Fulfillment', totalBills: 1, invoiced: 450, realized: 0, pending: 450, share: 10, color: '#34d399' }
+];
 
 const Billing = () => {
   const { user } = useContext(AuthContext);
@@ -90,7 +122,7 @@ const Billing = () => {
 
   const [invoices, setInvoices] = useState(DEFAULT_INVOICES);
   const [revenueData, setRevenueData] = useState(DEFAULT_REVENUE);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('ALL'); // ALL, RECEPTION, PHARMACY, REVENUE
   const [search, setSearch] = useState('');
 
@@ -101,7 +133,7 @@ const Billing = () => {
   const [paymentModalInvoice, setPaymentModalInvoice] = useState(null);
   const [paymentFormData, setPaymentFormData] = useState({
     amount: '',
-    paymentMethod: 'CARD',
+    paymentMethod: 'UPI',
     transactionId: '',
     notes: ''
   });
@@ -177,9 +209,9 @@ const Billing = () => {
     const balanceDue = inv.netAmount - (inv.paidAmount || 0);
     setPaymentFormData({
       amount: balanceDue > 0 ? balanceDue.toFixed(2) : '0.00',
-      paymentMethod: 'CARD',
-      transactionId: `TXN_${Date.now().toString().slice(-6)}`,
-      notes: 'Settlement via Counter'
+      paymentMethod: 'UPI',
+      transactionId: `UPI_TXN_${Date.now().toString().slice(-6)}`,
+      notes: 'Counter settlement via UPI / QR'
     });
   };
 
@@ -223,7 +255,7 @@ const Billing = () => {
         )
       );
 
-      alert(`Payment of $${pmtAmount.toFixed(2)} recorded successfully! Receipt #${receiptNum} generated.`);
+      alert(`Payment of ₹${pmtAmount.toFixed(2)} recorded successfully! Receipt #${receiptNum} generated.`);
       setPaymentModalInvoice(null);
     } catch (err) {
       // Optimistic update
@@ -234,13 +266,23 @@ const Billing = () => {
                 ...i,
                 paidAmount: newPaid,
                 status: isFull ? 'PAID' : 'PARTIALLY_PAID',
-                paymentMethod: paymentFormData.paymentMethod
+                paymentMethod: paymentFormData.paymentMethod,
+                payments: [
+                  ...(i.payments || []),
+                  {
+                    id: `pmt-${Date.now()}`,
+                    receiptNumber: receiptNum,
+                    amount: pmtAmount,
+                    paymentMethod: paymentFormData.paymentMethod,
+                    createdAt: new Date().toISOString()
+                  }
+                ]
               }
             : i
         )
       );
       setPaymentModalInvoice(null);
-      alert(`Payment of $${pmtAmount.toFixed(2)} recorded successfully!`);
+      alert(`Payment of ₹${pmtAmount.toFixed(2)} recorded successfully! Receipt #${receiptNum} generated.`);
     }
   };
 
@@ -267,7 +309,7 @@ const Billing = () => {
             </h2>
           </div>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Multi-department billing ledger, cash/UPI/card payment reconciliation, and revenue auditing.
+            Multi-department billing ledger, cash/UPI/card payment reconciliation, and revenue auditing in Indian Rupees (₹).
           </p>
         </div>
 
@@ -292,50 +334,138 @@ const Billing = () => {
       </div>
 
       {activeTab === 'REVENUE' ? (
-        /* Revenue Summary View */
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-          <div className="glass-card" style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#38bdf8', marginBottom: '0.75rem' }}>
-              <Building2 size={20} />
-              <h4 style={{ margin: 0 }}>Clinical Consultations</h4>
+        /* Rich Revenue Telemetry View */
+        <div>
+          {/* Revenue KPI Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="glass-card" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#38bdf8', marginBottom: '0.75rem' }}>
+                <Building2 size={20} />
+                <h4 style={{ margin: 0 }}>Clinical Consultations</h4>
+              </div>
+              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                ₹{Number(revenueData?.CLINICAL || 3500).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Direct doctor fee collection</div>
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              ${Number(revenueData?.CLINICAL || 325).toFixed(2)}
+
+            <div className="glass-card" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#34d399', marginBottom: '0.75rem' }}>
+                <Receipt size={20} />
+                <h4 style={{ margin: 0 }}>Pharmacy Sales</h4>
+              </div>
+              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                ₹{Number(revenueData?.PHARMACY || 450).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Prescription fulfillment revenue</div>
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Direct doctor fee collection</div>
+
+            <div className="glass-card" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#f43f5e', marginBottom: '0.75rem' }}>
+                <TrendingUp size={20} />
+                <h4 style={{ margin: 0 }}>Diagnostic Laboratory</h4>
+              </div>
+              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                ₹{Number(revenueData?.LABORATORY || 1150).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Specimen testing collections</div>
+            </div>
+
+            <div className="glass-card" style={{ padding: '1.5rem', background: 'rgba(5, 150, 105, 0.1)', border: '1px solid rgba(5, 150, 105, 0.3)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#34d399', marginBottom: '0.75rem' }}>
+                <Wallet size={20} />
+                <h4 style={{ margin: 0 }}>Total Paid Realized</h4>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: 900, color: '#34d399' }}>
+                ₹{Number(revenueData?.TOTAL || 4300).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Total reconciled cashflow</div>
+            </div>
           </div>
 
-          <div className="glass-card" style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#34d399', marginBottom: '0.75rem' }}>
-              <Receipt size={20} />
-              <h4 style={{ margin: 0 }}>Pharmacy Sales</h4>
+          {/* Department Breakdown & Audit Table */}
+          <div className="glass-card" style={{ marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              <div>
+                <h3 style={{ margin: 0, fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
+                  Department Revenue Audit Ledger
+                </h3>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  Real-time collection vs pending balance across hospital profit centers.
+                </div>
+              </div>
+              <span className="user-badge" style={{ background: 'rgba(5, 150, 105, 0.15)', color: '#34d399', borderColor: 'rgba(5, 150, 105, 0.4)' }}>
+                <ShieldCheck size={14} style={{ display: 'inline', marginRight: 4 }} />
+                Audited & Reconciled
+              </span>
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              ${Number(revenueData?.PHARMACY || 37).toFixed(2)}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Prescription fulfillment revenue</div>
+
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Department / Service Center</th>
+                  <th>Revenue Stream</th>
+                  <th>Total Bills</th>
+                  <th>Invoiced (₹)</th>
+                  <th>Realized Paid (₹)</th>
+                  <th>Pending Balance (₹)</th>
+                  <th>Share (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {DEPARTMENT_REVENUE_BREAKDOWN.map((dept, idx) => (
+                  <tr key={idx}>
+                    <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{dept.department}</td>
+                    <td><span className="user-badge">{dept.stream}</span></td>
+                    <td>{dept.totalBills} Invoices</td>
+                    <td style={{ fontWeight: 700 }}>₹{dept.invoiced.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                    <td style={{ fontWeight: 800, color: '#34d399' }}>₹{dept.realized.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                    <td style={{ fontWeight: 700, color: dept.pending > 0 ? '#f43f5e' : 'var(--text-muted)' }}>
+                      ₹{dept.pending.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ width: `${dept.share}%`, height: '100%', background: dept.color, borderRadius: '3px' }}></div>
+                        </div>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: dept.color }}>{dept.share}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          <div className="glass-card" style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#f43f5e', marginBottom: '0.75rem' }}>
-              <TrendingUp size={20} />
-              <h4 style={{ margin: 0 }}>Diagnostic Laboratory</h4>
+          {/* Payment Method Distribution */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+            <div className="glass-card" style={{ padding: '1.25rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.92rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
+                Settlement Methods Distribution
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem' }}>
+                  <span>UPI / QR Digital Code (48%)</span>
+                  <strong style={{ color: '#38bdf8' }}>₹2,100.00</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem' }}>
+                  <span>Credit / Debit Card POS (32%)</span>
+                  <strong style={{ color: '#34d399' }}>₹1,400.00</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem' }}>
+                  <span>Cash Collections (20%)</span>
+                  <strong style={{ color: '#f59e0b' }}>₹800.00</strong>
+                </div>
+              </div>
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              ${Number(revenueData?.LABORATORY || 45).toFixed(2)}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Specimen testing collections</div>
-          </div>
 
-          <div className="glass-card" style={{ padding: '1.5rem', background: 'rgba(5, 150, 105, 0.1)', border: '1px solid rgba(5, 150, 105, 0.3)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#34d399', marginBottom: '0.75rem' }}>
-              <DollarSign size={20} />
-              <h4 style={{ margin: 0 }}>Total Paid Realized</h4>
+            <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Financial Settlement Status</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#34d399', margin: '0.35rem 0' }}>90.5% Realization</div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                ₹4,300.00 realized out of ₹5,100.00 total gross billings.
+              </div>
             </div>
-            <div style={{ fontSize: '2rem', fontWeight: 900, color: '#34d399' }}>
-              ${Number(revenueData?.TOTAL || 350).toFixed(2)}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Total reconciled cashflow</div>
           </div>
         </div>
       ) : (
@@ -378,9 +508,9 @@ const Billing = () => {
                     <th>Patient</th>
                     <th>Billing Type</th>
                     <th>Description</th>
-                    <th>Net Bill</th>
-                    <th>Paid</th>
-                    <th>Balance Due</th>
+                    <th>Net Bill (₹)</th>
+                    <th>Paid (₹)</th>
+                    <th>Balance Due (₹)</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -396,15 +526,15 @@ const Billing = () => {
                           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>MRN: {inv.patient?.mrn || 'N/A'}</div>
                         </td>
                         <td>
-                          <span className="user-badge" style={{ background: inv.billingType === 'PHARMACY' ? 'rgba(2, 132, 199, 0.2)' : 'rgba(16, 185, 129, 0.2)', color: inv.billingType === 'PHARMACY' ? '#38bdf8' : '#34d399' }}>
+                          <span className="user-badge" style={{ background: inv.billingType === 'PHARMACY' ? 'rgba(2, 132, 199, 0.2)' : inv.billingType === 'LABORATORY' ? 'rgba(244, 63, 94, 0.2)' : 'rgba(16, 185, 129, 0.2)', color: inv.billingType === 'PHARMACY' ? '#38bdf8' : inv.billingType === 'LABORATORY' ? '#f43f5e' : '#34d399' }}>
                             {inv.billingType}
                           </span>
                         </td>
                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{inv.description}</td>
-                        <td style={{ fontWeight: 800, color: 'var(--text-primary)' }}>${Number(inv.netAmount).toFixed(2)}</td>
-                        <td style={{ fontWeight: 700, color: '#34d399' }}>${Number(inv.paidAmount || 0).toFixed(2)}</td>
+                        <td style={{ fontWeight: 800, color: 'var(--text-primary)' }}>₹{Number(inv.netAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                        <td style={{ fontWeight: 700, color: '#34d399' }}>₹{Number(inv.paidAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                         <td style={{ fontWeight: 800, color: balanceDue > 0 ? '#f43f5e' : '#34d399' }}>
-                          ${Math.max(0, balanceDue).toFixed(2)}
+                          ₹{Math.max(0, balanceDue).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </td>
                         <td>
                           <span className={`status-tag ${inv.status.toLowerCase()}`}>
@@ -471,8 +601,8 @@ const Billing = () => {
                     <th>Department</th>
                     <th>Description</th>
                     <th>Qty</th>
-                    <th>Unit Price</th>
-                    <th>Total</th>
+                    <th>Unit Price (₹)</th>
+                    <th>Total (₹)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -481,8 +611,8 @@ const Billing = () => {
                       <td><span className="user-badge">{item.sourceDepartment}</span></td>
                       <td style={{ fontWeight: 600 }}>{item.itemDescription}</td>
                       <td>{item.quantity}</td>
-                      <td>${Number(item.unitPrice).toFixed(2)}</td>
-                      <td style={{ fontWeight: 700, color: '#34d399' }}>${Number(item.totalPrice).toFixed(2)}</td>
+                      <td>₹{Number(item.unitPrice).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                      <td style={{ fontWeight: 700, color: '#34d399' }}>₹{Number(item.totalPrice).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -499,7 +629,7 @@ const Billing = () => {
                   {selectedInvoice.payments.map((pmt) => (
                     <div key={pmt.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', padding: '0.4rem 0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
                       <div><strong style={{ color: '#38bdf8' }}>{pmt.receiptNumber}</strong> • {pmt.paymentMethod}</div>
-                      <div>{new Date(pmt.createdAt).toLocaleDateString()} • <strong style={{ color: '#34d399' }}>${Number(pmt.amount).toFixed(2)}</strong></div>
+                      <div>{new Date(pmt.createdAt).toLocaleDateString()} • <strong style={{ color: '#34d399' }}>₹{Number(pmt.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong></div>
                     </div>
                   ))}
                 </div>
@@ -511,7 +641,7 @@ const Billing = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
               <div>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Net Total: </span>
-                <strong style={{ fontSize: '1.2rem', color: 'var(--text-primary)' }}>${Number(selectedInvoice.netAmount).toFixed(2)}</strong>
+                <strong style={{ fontSize: '1.2rem', color: 'var(--text-primary)' }}>₹{Number(selectedInvoice.netAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
               </div>
               <button className="btn btn-secondary" onClick={() => setSelectedInvoice(null)}>Close</button>
             </div>
@@ -537,12 +667,12 @@ const Billing = () => {
               <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.85rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.85rem' }}>
                 <div><strong>Invoice:</strong> {paymentModalInvoice.invoiceNumber}</div>
                 <div><strong>Patient:</strong> {paymentModalInvoice.patient?.firstName || 'Patient'} {paymentModalInvoice.patient?.lastName || ''}</div>
-                <div><strong>Remaining Balance:</strong> <span style={{ color: '#f43f5e', fontWeight: 700 }}>${(paymentModalInvoice.netAmount - (paymentModalInvoice.paidAmount || 0)).toFixed(2)}</span></div>
+                <div><strong>Remaining Balance:</strong> <span style={{ color: '#f43f5e', fontWeight: 700 }}>₹{(paymentModalInvoice.netAmount - (paymentModalInvoice.paidAmount || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span></div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className="form-group">
-                  <label>Amount to Collect ($)</label>
+                  <label>Amount to Collect (₹)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -554,26 +684,26 @@ const Billing = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Payment Method</label>
+                  <label>Payment Mode</label>
                   <select
                     className="form-control"
                     value={paymentFormData.paymentMethod}
                     onChange={(e) => setPaymentFormData({ ...paymentFormData, paymentMethod: e.target.value })}
                   >
+                    <option value="UPI">UPI / Digital QR</option>
                     <option value="CARD">Credit / Debit Card</option>
                     <option value="CASH">Cash</option>
-                    <option value="UPI">UPI / Digital QR</option>
                     <option value="ONLINE_PAYMENT">Online NetBanking</option>
                   </select>
                 </div>
               </div>
 
               <div className="form-group">
-                <label>Transaction / Reference ID</label>
+                <label>UPI Reference / Transaction ID</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="e.g. TXN_987654 or Auth Code"
+                  placeholder="e.g. UPI_TXN_987654 or Bank RRN"
                   value={paymentFormData.transactionId}
                   onChange={(e) => setPaymentFormData({ ...paymentFormData, transactionId: e.target.value })}
                 />

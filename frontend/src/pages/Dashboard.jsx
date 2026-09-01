@@ -30,9 +30,9 @@ const DEFAULT_STATS = {
   completedLabTests: 1,
   lowStockCount: 2,
   outOfStockCount: 1,
-  totalRevenue: '490.00',
-  todayRevenue: '140.00',
-  monthlyRevenue: '490.00',
+  totalRevenue: '4300.00',
+  todayRevenue: '1400.00',
+  monthlyRevenue: '4300.00',
   staffBreakdown: {
     doctors: { total: 5, available: 4 },
     nurses: { total: 2, available: 2 },
@@ -40,10 +40,10 @@ const DEFAULT_STATS = {
     cleaners: { total: 1, available: 1 }
   },
   departmentRevenue: {
-    reception: '350.00',
-    pharmacy: '49.00',
-    laboratory: '91.00',
-    total: '490.00'
+    reception: '3500.00',
+    pharmacy: '450.00',
+    laboratory: '1150.00',
+    total: '4300.00'
   },
   pharmacy: {
     totalItems: 6,
@@ -276,10 +276,10 @@ const Dashboard = () => {
         />
         <StatCard
           title="Revenue (Today)"
-          value={`$${Number(stats?.todayRevenue || 0).toFixed(2)}`}
+          value={`₹${Number(stats?.todayRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
           icon={DollarSign}
           color="#059669"
-          subtext={`Total: $${Number(stats?.totalRevenue || 0).toFixed(2)}`}
+          subtext={`Total: ₹${Number(stats?.totalRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
         />
       </div>
 
@@ -345,7 +345,7 @@ const Dashboard = () => {
                     </h4>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                    Cardiology Clinic • Suite 302 • Fee: $150.00
+                    Cardiology Clinic • Suite 302 • Consultation Fee: ₹1,500.00
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -371,7 +371,7 @@ const Dashboard = () => {
                     </h4>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                    Neurology Clinic • Suite 410 • Fee: $175.00
+                    Neurology Clinic • Suite 410 • Consultation Fee: ₹1,750.00
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -398,7 +398,7 @@ const Dashboard = () => {
                   </h4>
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                  Location: Ground Floor, Suite 302 • Consultation Fee: $150.00 • Active Queue
+                  Location: Ground Floor, Suite 302 • Consultation Fee: ₹1,500.00 • Active Queue
                 </div>
               </div>
               <span className="user-badge" style={{ background: 'rgba(5, 150, 105, 0.2)', color: '#34d399', borderColor: '#059669' }}>
@@ -419,7 +419,7 @@ const Dashboard = () => {
                   </h4>
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                  Location: Ground Floor, Suite 410 • Consultation Fee: $175.00 • Active Queue
+                  Location: Ground Floor, Suite 410 • Consultation Fee: ₹1,750.00 • Active Queue
                 </div>
               </div>
               <span className="user-badge" style={{ background: 'rgba(2, 132, 199, 0.2)', color: '#38bdf8', borderColor: '#0284c7' }}>

@@ -21,7 +21,7 @@ const DEFAULT_LAB_TESTS = [
     id: 'lab-01',
     testName: 'Complete Blood Count (CBC)',
     category: 'Hematology',
-    cost: 45.00,
+    cost: 450.00,
     status: 'COMPLETED',
     resultSummary: 'WBC: 6.5 x10^9/L, RBC: 4.8 x10^12/L, Hemoglobin: 14.2 g/dL, Platelets: 250 x10^9/L. All parameters within normal clinical reference range.',
     patient: { firstName: 'John', lastName: 'Doe', mrn: 'MRN-2026-001' },
@@ -31,7 +31,7 @@ const DEFAULT_LAB_TESTS = [
     id: 'lab-02',
     testName: 'Brain MRI Screening',
     category: 'Radiology',
-    cost: 250.00,
+    cost: 2500.00,
     status: 'PENDING',
     resultSummary: null,
     patient: { firstName: 'Eleanor', lastName: 'Vance', mrn: 'MRN-2026-002' },
@@ -41,7 +41,7 @@ const DEFAULT_LAB_TESTS = [
     id: 'lab-03',
     testName: 'Lipid Profile Panel',
     category: 'Biochemistry',
-    cost: 60.00,
+    cost: 600.00,
     status: 'PROCESSING',
     resultSummary: 'Specimen currently in centrifuge automated biochemical analyzer.',
     patient: { firstName: 'Alex', lastName: 'Morgan', mrn: 'MRN-2026-003' },
@@ -303,7 +303,7 @@ const Laboratory = () => {
                   </td>
                   <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t.testName}</td>
                   <td><span className="user-badge" style={{ background: 'rgba(2, 132, 199, 0.1)', color: '#38bdf8' }}>{t.category}</span></td>
-                  <td style={{ fontWeight: 700, color: '#34d399' }}>${Number(t.cost || 50).toFixed(2)}</td>
+                  <td style={{ fontWeight: 700, color: '#34d399' }}>₹{Number(t.cost || 450).toFixed(2)}</td>
                   <td style={{ color: 'var(--text-secondary)' }}>{t.requestedBy || 'Attending Physician'}</td>
                   <td>
                     <span className={`status-tag ${t.status.toLowerCase()}`}>
@@ -411,7 +411,7 @@ const Laboratory = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Investigation Fee ($)</label>
+                  <label>Investigation Fee (₹)</label>
                   <input
                     type="number"
                     step="0.01"

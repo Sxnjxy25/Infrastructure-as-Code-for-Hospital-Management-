@@ -309,7 +309,7 @@ const Pharmacy = () => {
                     <td style={{ fontWeight: 800, fontSize: '0.95rem', color: isOut ? '#ef4444' : isLow ? '#fbbf24' : '#34d399' }}>
                       {m.quantity} Units
                     </td>
-                    <td style={{ fontWeight: 700 }}>${Number(m.unitPrice).toFixed(2)}</td>
+                    <td style={{ fontWeight: 700 }}>₹{Number(m.unitPrice).toFixed(2)}</td>
                     <td style={{ color: 'var(--text-muted)' }}>{m.reorderThreshold} Units</td>
                     <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                       {new Date(m.expiryDate).toLocaleDateString()}
@@ -382,7 +382,7 @@ const Pharmacy = () => {
                       <option value="">-- Select Medicine --</option>
                       {medicines.map(m => (
                         <option key={m.id} value={m.id} disabled={m.quantity === 0}>
-                          {m.name} ({m.code}) — In Stock: {m.quantity} | ${m.unitPrice}
+                          {m.name} ({m.code}) — In Stock: {m.quantity} | ₹{m.unitPrice}
                         </option>
                       ))}
                     </select>
@@ -494,7 +494,7 @@ const Pharmacy = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className="form-group">
-                  <label>Unit Selling Price ($)</label>
+                  <label>Unit Selling Price (₹)</label>
                   <input
                     type="number"
                     step="0.01"
