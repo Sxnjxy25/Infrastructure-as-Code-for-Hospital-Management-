@@ -562,7 +562,7 @@ const Doctors = () => {
                   <div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Consultation Fee</div>
                     <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#34d399' }}>
-                      ${Number(doc.consultationFee || 150).toFixed(2)}
+                      ₹{Number(doc.consultationFee || 1500).toFixed(2)}
                     </div>
                   </div>
 

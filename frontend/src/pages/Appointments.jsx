@@ -340,6 +340,84 @@ const Appointments = () => {
     }
   };
 
+  const handlePrintTokenPass = (booking) => {
+    if (!booking) return;
+    const printWindow = window.open('', '_blank', 'width=460,height=680');
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Token Pass #${booking.tokenNumber} - ${booking.patient?.firstName || ''} ${booking.patient?.lastName || ''}</title>
+          <style>
+            @page { size: 80mm auto; margin: 4mm; }
+            * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+            body { margin: 0; padding: 12px; color: #000; background: #fff; text-align: center; font-size: 12px; }
+            .header { border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 12px; }
+            .h-title { font-size: 17px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; margin: 0; }
+            .h-sub { font-size: 11px; color: #444; margin-top: 2px; }
+            .h-type { font-size: 11px; font-weight: 800; color: #111; margin-top: 4px; }
+            .token-box { border: 2px solid #000; border-radius: 8px; padding: 12px 4px; margin: 12px 0; background: #fafafa; }
+            .t-label { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+            .t-num { font-size: 58px; font-weight: 900; line-height: 1; margin: 6px 0; letter-spacing: -1px; }
+            .t-doc { font-size: 13px; font-weight: 800; }
+            .details { text-align: left; font-size: 12px; line-height: 1.6; border-bottom: 1px dashed #000; padding-bottom: 12px; margin-bottom: 12px; }
+            .row { display: flex; justify-content: space-between; margin-bottom: 3px; }
+            .row span:first-child { color: #555; }
+            .row span:last-child { font-weight: 700; color: #000; }
+            .barcode { font-family: monospace; font-size: 15px; letter-spacing: 3px; font-weight: bold; margin: 6px 0 2px 0; }
+            .footer { font-size: 10px; color: #444; line-height: 1.4; margin-top: 6px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="h-title">🏥 CAREPULSE HOSPITAL</h1>
+            <div class="h-sub">Apex Healthcare & Multispecialty Center</div>
+            <div class="h-type">OPD CLINICAL APPOINTMENT TOKEN PASS</div>
+          </div>
+
+          <div class="token-box">
+            <div class="t-label">CONSULTATION TOKEN NUMBER</div>
+            <div class="t-num">#${booking.tokenNumber}</div>
+            <div class="t-doc">${booking.doctor?.user?.name || 'Assigned Physician'} (${booking.doctor?.specialization || 'Clinical'})</div>
+          </div>
+
+          <div class="details">
+            <div class="row"><span>Patient:</span><span>${booking.patient?.firstName || ''} ${booking.patient?.lastName || ''}</span></div>
+            <div class="row"><span>MRN / Reg No:</span><span>${booking.patient?.mrn || 'N/A'}</span></div>
+            <div class="row"><span>Phone:</span><span>${booking.patient?.phone || 'N/A'}</span></div>
+            <div class="row"><span>Channel:</span><span>${booking.channel || 'OFFLINE'} (Walk-in)</span></div>
+            <div class="row"><span>Date & Time:</span><span>${new Date(booking.appointmentDate).toLocaleString()}</span></div>
+            <div class="row"><span>Consultation Fee:</span><span>₹${Number(booking.doctor?.consultationFee || 1500).toFixed(2)}</span></div>
+          </div>
+
+          <div class="barcode">||| | ||||| || |||| ||| ||||</div>
+          <div style="font-size: 10px; font-weight: 700;">*TOKEN-${booking.tokenNumber}-${booking.patient?.mrn || 'OPD'}*</div>
+          
+          <div class="footer">
+            <div>Please proceed to the OPD Waiting Lounge.</div>
+            <div>Watch the display board for Token #${booking.tokenNumber}.</div>
+            <div style="margin-top: 6px; font-size: 9px; color: #777;">Printed at: ${new Date().toLocaleTimeString()} • CarePulse HMS</div>
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.focus();
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
   const handleOpenCompleteModal = (app) => {
     setCompleteAppModal(app);
     setCompleteFormData({
@@ -623,7 +701,7 @@ const Appointments = () => {
                     </h4>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                    Cardiology Clinic • Suite 302 • Fee: $150.00
+                    Cardiology Clinic • Suite 302 • Fee: ₹1,500.00
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -649,7 +727,7 @@ const Appointments = () => {
                     </h4>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                    Neurology Clinic • Suite 410 • Fee: $175.00
+                    Neurology Clinic • Suite 410 • Fee: ₹1,750.00
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -676,7 +754,7 @@ const Appointments = () => {
                   </h4>
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                  Location: Ground Floor, Suite 302 • Consultation Fee: $150.00 • Active Queue
+                  Location: Ground Floor, Suite 302 • Consultation Fee: ₹1,500.00 • Active Queue
                 </div>
               </div>
               <span className="user-badge" style={{ background: 'rgba(5, 150, 105, 0.2)', color: '#34d399', borderColor: '#059669' }}>
@@ -697,7 +775,7 @@ const Appointments = () => {
                   </h4>
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                  Location: Ground Floor, Suite 410 • Consultation Fee: $175.00 • Active Queue
+                  Location: Ground Floor, Suite 410 • Consultation Fee: ₹1,750.00 • Active Queue
                 </div>
               </div>
               <span className="user-badge" style={{ background: 'rgba(2, 132, 199, 0.2)', color: '#38bdf8', borderColor: '#0284c7' }}>
@@ -1087,7 +1165,7 @@ const Appointments = () => {
 
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <button
-                className="btn btn-primary"
+                className="btn btn-primary no-print"
                 style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
                 onClick={() => setConfirmedBookingModal(null)}
               >
@@ -1095,13 +1173,82 @@ const Appointments = () => {
                 <span>Done & View Queue</span>
               </button>
               <button
-                className="btn btn-secondary"
+                className="btn btn-secondary no-print"
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
-                onClick={() => window.print()}
+                onClick={() => handlePrintTokenPass(confirmedBookingModal)}
               >
                 <Printer size={16} />
                 <span>Print Pass</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Standalone Printable Token Pass Slip (Visible strictly during standard browser print) */}
+      {confirmedBookingModal && (
+        <div className="printable-token-pass">
+          <div style={{ textAlign: 'center', borderBottom: '2px dashed #000', paddingBottom: '10px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '1.15rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              🏥 CAREPULSE HOSPITAL
+            </div>
+            <div style={{ fontSize: '0.75rem', color: '#444', marginTop: '2px' }}>
+              Apex Healthcare & Multispecialty Center
+            </div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#111', marginTop: '4px' }}>
+              OPD CLINICAL APPOINTMENT TOKEN PASS
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', border: '2px solid #000', borderRadius: '8px', padding: '10px 4px', margin: '12px 0', background: '#fafafa' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+              CONSULTATION TOKEN NUMBER
+            </div>
+            <div style={{ fontSize: '3.8rem', fontWeight: 900, lineHeight: 1.1, margin: '6px 0', letterSpacing: '-1px' }}>
+              #{confirmedBookingModal.tokenNumber}
+            </div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 800 }}>
+              {confirmedBookingModal.doctor?.user?.name || 'Assigned Physician'} ({confirmedBookingModal.doctor?.specialization || 'Clinical'})
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'left', fontSize: '0.8rem', lineHeight: 1.6, borderBottom: '1px dashed #000', paddingBottom: '12px', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#555' }}>Patient Name:</span>
+              <strong>{confirmedBookingModal.patient?.firstName} {confirmedBookingModal.patient?.lastName}</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#555' }}>MRN / Reg No:</span>
+              <strong>{confirmedBookingModal.patient?.mrn || 'N/A'}</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#555' }}>Phone:</span>
+              <span>{confirmedBookingModal.patient?.phone || 'N/A'}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#555' }}>Visit Channel:</span>
+              <strong style={{ textTransform: 'uppercase' }}>{confirmedBookingModal.channel || 'OFFLINE'} (Walk-in)</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#555' }}>Scheduled Time:</span>
+              <span>{new Date(confirmedBookingModal.appointmentDate).toLocaleString()}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#555' }}>Consultation Fee:</span>
+              <strong>₹{Number(confirmedBookingModal.doctor?.consultationFee || 1500).toFixed(2)}</strong>
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', fontSize: '0.72rem', color: '#444' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '15px', letterSpacing: '3px', fontWeight: 'bold', margin: '4px 0 2px 0' }}>
+              ||| | ||||| || |||| ||| ||||
+            </div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800 }}>*TOKEN-{confirmedBookingModal.tokenNumber}-{confirmedBookingModal.patient?.mrn || 'OPD'}*</div>
+            <div style={{ marginTop: '8px', fontStyle: 'italic' }}>
+              Please proceed to OPD Waiting Lounge. Watch the display board for Token #{confirmedBookingModal.tokenNumber}.
+            </div>
+            <div style={{ marginTop: '6px', fontSize: '0.68rem', color: '#777' }}>
+              Printed at: {new Date().toLocaleTimeString()} • CarePulse HMS Enterprise
             </div>
           </div>
         </div>

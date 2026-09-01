@@ -913,71 +913,77 @@ select.form-control option {
 }
 
 /* ==========================================================================
-   Print Stylesheet - Ensure Token Pass & Token Number are 100% Crisp & Visible
+   Print Stylesheet - Ensure ONLY Token Pass Slip is Printed (Single Clean Page)
    ========================================================================== */
 @media print {
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  body {
+  html, body {
     background: #ffffff !important;
-    color: #18181b !important;
+    color: #000000 !important;
     margin: 0 !important;
     padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 
-  header, nav, footer, section, .modal-close-btn, .btn, .modal-overlay::before {
+  /* Hide entire application layout when printing token pass */
+  .app-layout > *:not(.main-content),
+  .sidebar,
+  .navbar,
+  .landing-nav,
+  .editorial-hero,
+  header,
+  nav,
+  footer,
+  .btn,
+  button,
+  .status-tag,
+  .custom-table,
+  .glass-card,
+  .search-input-wrap,
+  .modal-overlay > *:not(.modal-content),
+  .no-print {
     display: none !important;
+    visibility: hidden !important;
   }
 
-  .modal-overlay {
-    position: static !important;
-    background: transparent !important;
-    padding: 0 !important;
+  body * {
+    visibility: hidden;
   }
 
-  .modal-content {
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
+  .printable-token-pass,
+  .printable-token-pass * {
+    visibility: visible !important;
+  }
+
+  .printable-token-pass {
+    position: absolute !important;
+    left: 50% !important;
+    top: 20px !important;
+    transform: translateX(-50%) !important;
+    width: 380px !important;
     max-width: 100% !important;
-  }
-
-  .token-pass-card {
-    background: #ffffff !important;
-    color: #18181b !important;
-    border: 3px solid #059669 !important;
-    box-shadow: none !important;
-    padding: 2rem !important;
     margin: 0 auto !important;
-    max-width: 600px !important;
-    page-break-inside: avoid;
-  }
-
-  .token-pass-card * {
-    color: #18181b !important;
-  }
-
-  .token-badge-number {
-    color: #059669 !important;
-    font-size: 3.5rem !important;
-    font-weight: 900 !important;
-    text-shadow: none !important;
-  }
-
-  .token-print-banner {
-    background: #059669 !important;
-    color: #ffffff !important;
-    padding: 0.85rem !important;
+    padding: 24px !important;
+    border: 2px dashed #18181b !important;
     border-radius: 8px !important;
-    text-align: center !important;
-    margin: 1rem 0 !important;
-  }
-
-  .token-print-banner * {
-    color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    display: block !important;
+    z-index: 99999999 !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    page-break-inside: avoid !important;
   }
 }
 
