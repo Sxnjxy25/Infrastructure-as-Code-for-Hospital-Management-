@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import {
   Calendar,
   Plus,
   CheckCircle,
+  CheckCircle2,
   FileText,
   TestTube,
   Pill,
@@ -19,7 +21,9 @@ import {
   Activity,
   AlertCircle,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Printer,
+  ShieldCheck
 } from 'lucide-react';
 
 const DEFAULT_APPOINTMENTS = [
@@ -132,6 +136,7 @@ const COMMON_LAB_TESTS = [
 
 const Appointments = () => {
   const { user } = useContext(AuthContext);
+  const { showSuccess, showError } = useToast();
   const isDoctor = user?.role === 'DOCTOR' || user?.role === 'ADMIN';
 
   const [appointments, setAppointments] = useState([]);
@@ -143,6 +148,7 @@ const Appointments = () => {
 
   // Booking Modal
   const [showModal, setShowModal] = useState(false);
+  const [confirmedBookingModal, setConfirmedBookingModal] = useState(null);
   const [patientData, setPatientData] = useState({
     firstName: '',
     lastName: '',
@@ -300,7 +306,12 @@ const Appointments = () => {
         reason: ''
       });
 
-      alert(`✅ Patient Registered & Appointment Booked Successfully!\n• Patient: ${registeredPatient.firstName} ${registeredPatient.lastName} (MRN: ${registeredPatient.mrn})\n• Attending Doctor: ${selectedDoctor.user?.name || 'Assigned Doctor'}\n• Token #${created.tokenNumber || nextToken} Issued.`);
+      setConfirmedBookingModal({
+        ...created,
+        patient: registeredPatient,
+        doctor: selectedDoctor
+      });
+      showSuccess('Appointment Confirmed', `Token #${created.tokenNumber || nextToken} issued for ${registeredPatient.firstName} ${registeredPatient.lastName}`);
     } catch (err) {
       setAppointments(prev => [newApp, ...prev]);
       setShowModal(false);
@@ -320,7 +331,12 @@ const Appointments = () => {
         reason: ''
       });
 
-      alert(`✅ Patient Registered & Appointment Booked Successfully!\n• Patient: ${registeredPatient.firstName} ${registeredPatient.lastName} (MRN: ${registeredPatient.mrn})\n• Attending Doctor: ${selectedDoctor.user?.name || 'Assigned Doctor'}\n• Token #${nextToken} Issued.`);
+      setConfirmedBookingModal({
+        ...newApp,
+        patient: registeredPatient,
+        doctor: selectedDoctor
+      });
+      showSuccess('Appointment Confirmed', `Token #${nextToken} issued for ${registeredPatient.firstName} ${registeredPatient.lastName}`);
     }
   };
 
@@ -368,7 +384,7 @@ const Appointments = () => {
         )
       );
 
-      alert('Consultation completed! Automated billing line item recorded and diagnostic test requests dispatched.');
+      showSuccess('Consultation Completed', 'Automated billing line item recorded and diagnostic test requests dispatched.');
       setCompleteAppModal(null);
     } catch (err) {
       // Optimistic update
@@ -385,7 +401,7 @@ const Appointments = () => {
         )
       );
       setCompleteAppModal(null);
-      alert('Consultation completed successfully!');
+      showSuccess('Consultation Completed', 'Visit completed and clinical records updated.');
     }
   };
 
@@ -996,7 +1012,7 @@ const Appointments = () => {
                           </div>
                         </div>
                         <div style={{ fontSize: '0.78rem', color: '#34d399', fontWeight: 700 }}>
-                          ${t.cost.toFixed(2)}
+                          ₹{t.cost.toFixed(2)}
                         </div>
                       </div>
                     );
@@ -1013,6 +1029,80 @@ const Appointments = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Rich In-App Appointment Pass & Confirmation Modal */}
+      {confirmedBookingModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '520px', textAlign: 'center', padding: '2rem 1.75rem' }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(5, 150, 105, 0.15)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
+              <CheckCircle2 size={36} />
+            </div>
+
+            <h3 style={{ margin: '0 0 0.4rem 0', fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.4rem', color: 'var(--text-primary)' }}>
+              Outpatient Visit Confirmed!
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1.25rem 0' }}>
+              Patient has been successfully registered into EHR and queued for doctor consultation.
+            </p>
+
+            {/* Token Badge */}
+            <div style={{ background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.15), rgba(5, 150, 105, 0.15))', border: '2px dashed #0284c7', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, color: '#38bdf8' }}>
+                Assigned Consultation Token
+              </div>
+              <div style={{ fontSize: '3.2rem', fontWeight: 900, color: '#38bdf8', letterSpacing: '-1px', margin: '0.2rem 0' }}>
+                #{confirmedBookingModal.tokenNumber}
+              </div>
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                {confirmedBookingModal.doctor?.user?.name || 'Assigned Doctor'} • {confirmedBookingModal.doctor?.specialization || 'Clinical'}
+              </div>
+            </div>
+
+            {/* Patient & Clinic Details Card */}
+            <div style={{ background: 'rgba(0, 0, 0, 0.25)', borderRadius: '10px', padding: '1rem', textAlign: 'left', fontSize: '0.85rem', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Patient Name:</span>
+                <strong style={{ color: 'var(--text-primary)' }}>{confirmedBookingModal.patient?.firstName} {confirmedBookingModal.patient?.lastName}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)' }}>EHR Medical Record #:</span>
+                <span className="user-badge" style={{ padding: '0.15rem 0.5rem', fontSize: '0.78rem' }}>{confirmedBookingModal.patient?.mrn || 'MRN-2026-NEW'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Contact Phone:</span>
+                <span>{confirmedBookingModal.patient?.phone || 'N/A'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Scheduled Time:</span>
+                <span>{new Date(confirmedBookingModal.appointmentDate).toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Consultation Channel:</span>
+                <span style={{ color: '#38bdf8', fontWeight: 700 }}>{confirmedBookingModal.channel || 'OFFLINE'}</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                className="btn btn-primary"
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                onClick={() => setConfirmedBookingModal(null)}
+              >
+                <CheckCircle size={16} />
+                <span>Done & View Queue</span>
+              </button>
+              <button
+                className="btn btn-secondary"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                onClick={() => window.print()}
+              >
+                <Printer size={16} />
+                <span>Print Pass</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
