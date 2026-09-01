@@ -9,6 +9,7 @@ import {
   TestTube,
   Pill,
   User,
+  UserPlus,
   Clock,
   Globe,
   MapPin,
@@ -142,12 +143,24 @@ const Appointments = () => {
 
   // Booking Modal
   const [showModal, setShowModal] = useState(false);
+  const [patientMode, setPatientMode] = useState('EXISTING'); // 'EXISTING' or 'NEW'
   const [formData, setFormData] = useState({
     patientId: '',
     doctorId: '',
     appointmentDate: new Date().toISOString().slice(0, 16),
     channel: 'OFFLINE',
     reason: ''
+  });
+  const [newPatientData, setNewPatientData] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    gender: 'Male',
+    bloodGroup: 'O+',
+    dateOfBirth: '1990-01-01',
+    address: '',
+    emergencyContact: '',
+    medicalHistory: ''
   });
 
   // Completion Modal
@@ -217,7 +230,41 @@ const Appointments = () => {
 
   const handleBook = async (e) => {
     e.preventDefault();
-    const selectedPatient = patients.find(p => p.id === formData.patientId) || patients[0] || DEFAULT_PATIENTS[0];
+
+    let targetPatient = null;
+    let createdPat = null;
+
+    if (patientMode === 'NEW') {
+      const nextMrn = `MRN-2026-${String(patients.length + 1).padStart(3, '0')}`;
+      createdPat = {
+        id: `pat-${Date.now()}`,
+        mrn: nextMrn,
+        firstName: newPatientData.firstName || 'Walk-in',
+        lastName: newPatientData.lastName || 'Patient',
+        phone: newPatientData.phone || '+91-98765-00100',
+        gender: newPatientData.gender || 'Male',
+        bloodGroup: newPatientData.bloodGroup || 'O+',
+        dateOfBirth: newPatientData.dateOfBirth || '1990-01-01',
+        address: newPatientData.address || 'Metro City',
+        emergencyContact: newPatientData.emergencyContact || 'None',
+        medicalHistory: newPatientData.medicalHistory || 'None'
+      };
+
+      try {
+        const pRes = await api.post('/patients', newPatientData);
+        if (pRes.data?.data) {
+          createdPat = pRes.data.data;
+        }
+      } catch (pErr) {
+        console.warn('Patient creation fallback:', pErr);
+      }
+
+      setPatients(prev => [createdPat, ...prev.filter(p => p.id !== createdPat.id)]);
+      targetPatient = createdPat;
+    } else {
+      targetPatient = patients.find(p => p.id === formData.patientId) || patients[0] || DEFAULT_PATIENTS[0];
+    }
+
     const selectedDoctor = doctors.find(d => d.id === formData.doctorId) || doctors[0] || DEFAULT_DOCTORS[0];
 
     // Compute appropriate token number for this doctor stream
@@ -233,16 +280,17 @@ const Appointments = () => {
       channel: formData.channel || 'OFFLINE',
       appointmentDate: formData.appointmentDate || new Date().toISOString(),
       status: 'SCHEDULED',
-      reason: formData.reason || 'General Outpatient Visit',
-      patient: selectedPatient,
+      reason: formData.reason || (patientMode === 'NEW' ? 'New Patient Walk-in Consultation' : 'General Outpatient Visit'),
+      patient: targetPatient,
       doctor: selectedDoctor
     };
 
     try {
       const res = await api.post('/appointments', {
         ...formData,
-        patientId: selectedPatient?.id,
-        doctorId: selectedDoctor?.id
+        patientId: targetPatient?.id,
+        doctorId: selectedDoctor?.id,
+        reason: newApp.reason
       });
 
       const created = res.data?.data || newApp;
@@ -255,7 +303,24 @@ const Appointments = () => {
         channel: 'OFFLINE',
         reason: ''
       });
-      alert(`Appointment Booked Successfully! Token #${created.tokenNumber || nextToken} issued for ${selectedPatient?.firstName || 'Patient'}.`);
+      setNewPatientData({
+        firstName: '',
+        lastName: '',
+        phone: '',
+        gender: 'Male',
+        bloodGroup: 'O+',
+        dateOfBirth: '1990-01-01',
+        address: '',
+        emergencyContact: '',
+        medicalHistory: ''
+      });
+      setPatientMode('EXISTING');
+
+      if (patientMode === 'NEW') {
+        alert(`✅ Patient Registered & Appointment Booked!\n• Patient: ${targetPatient.firstName} ${targetPatient.lastName} (MRN: ${targetPatient.mrn})\n• Attending Doctor: ${selectedDoctor.user?.name || 'Assigned Doctor'}\n• Token #${created.tokenNumber || nextToken} Issued.`);
+      } else {
+        alert(`✅ Appointment Booked Successfully!\n• Token #${created.tokenNumber || nextToken} issued for ${targetPatient?.firstName || 'Patient'}.`);
+      }
     } catch (err) {
       setAppointments(prev => [newApp, ...prev]);
       setShowModal(false);
@@ -266,7 +331,24 @@ const Appointments = () => {
         channel: 'OFFLINE',
         reason: ''
       });
-      alert(`Appointment Booked Successfully! Token #${nextToken} issued for ${selectedPatient?.firstName || 'Patient'}.`);
+      setNewPatientData({
+        firstName: '',
+        lastName: '',
+        phone: '',
+        gender: 'Male',
+        bloodGroup: 'O+',
+        dateOfBirth: '1990-01-01',
+        address: '',
+        emergencyContact: '',
+        medicalHistory: ''
+      });
+      setPatientMode('EXISTING');
+
+      if (patientMode === 'NEW') {
+        alert(`✅ Patient Registered & Appointment Booked!\n• Patient: ${targetPatient.firstName} ${targetPatient.lastName} (MRN: ${targetPatient.mrn})\n• Attending Doctor: ${selectedDoctor.user?.name || 'Assigned Doctor'}\n• Token #${nextToken} Issued.`);
+      } else {
+        alert(`✅ Appointment Booked Successfully!\n• Token #${nextToken} issued for ${targetPatient?.firstName || 'Patient'}.`);
+      }
     }
   };
 
@@ -699,7 +781,7 @@ const Appointments = () => {
       {/* Book Appointment Modal */}
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '520px' }}>
+          <div className="modal-content" style={{ maxWidth: '560px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <Calendar size={22} color="#38bdf8" />
@@ -711,22 +793,160 @@ const Appointments = () => {
             </div>
 
             <form onSubmit={handleBook}>
-              <div className="form-group">
-                <label>Select Patient</label>
-                <select
-                  className="form-control"
-                  required
-                  value={formData.patientId}
-                  onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+              {/* Mode Switcher: Existing vs New Patient */}
+              <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.05)', padding: '0.25rem', borderRadius: '8px', marginBottom: '1.25rem', border: '1px solid rgba(255, 255, 255, 0.1)', gap: '0.35rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setPatientMode('EXISTING')}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: patientMode === 'EXISTING' ? '#0284c7' : 'transparent',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: '0.84rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.4rem',
+                    transition: 'all 0.2s ease'
+                  }}
                 >
-                  <option value="">-- Choose Patient --</option>
-                  {patients?.map(p => (
-                    <option key={p.id} value={p.id}>
-                      {p.firstName} {p.lastName} ({p.mrn})
-                    </option>
-                  ))}
-                </select>
+                  <User size={15} />
+                  <span>Existing Patient ({patients.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPatientMode('NEW')}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: patientMode === 'NEW' ? '#059669' : 'transparent',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: '0.84rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.4rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <UserPlus size={15} />
+                  <span>➕ Enter New Patient Walk-in</span>
+                </button>
               </div>
+
+              {patientMode === 'EXISTING' ? (
+                <div className="form-group">
+                  <label>Select Registered Patient</label>
+                  <select
+                    className="form-control"
+                    required={patientMode === 'EXISTING'}
+                    value={formData.patientId}
+                    onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+                  >
+                    <option value="">-- Choose Patient from EHR Records --</option>
+                    {patients?.map(p => (
+                      <option key={p.id} value={p.id}>
+                        {p.firstName} {p.lastName} ({p.mrn}) — {p.phone || 'No phone'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div style={{ background: 'rgba(5, 150, 105, 0.08)', border: '1px solid rgba(5, 150, 105, 0.25)', borderRadius: '8px', padding: '1rem', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#34d399', fontWeight: 700, fontSize: '0.88rem', marginBottom: '0.75rem' }}>
+                    <UserPlus size={16} />
+                    <span>New Patient Demographic & Intake</span>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                    <div>
+                      <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>First Name *</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        required={patientMode === 'NEW'}
+                        placeholder="e.g. Ramesh"
+                        value={newPatientData.firstName}
+                        onChange={(e) => setNewPatientData({ ...newPatientData, firstName: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Last Name</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="e.g. Kumar"
+                        value={newPatientData.lastName}
+                        onChange={(e) => setNewPatientData({ ...newPatientData, lastName: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                    <div>
+                      <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Phone Number *</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        required={patientMode === 'NEW'}
+                        placeholder="e.g. +91 98765 43210"
+                        value={newPatientData.phone}
+                        onChange={(e) => setNewPatientData({ ...newPatientData, phone: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Gender</label>
+                      <select
+                        className="form-control"
+                        value={newPatientData.gender}
+                        onChange={(e) => setNewPatientData({ ...newPatientData, gender: e.target.value })}
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    <div>
+                      <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Blood Group</label>
+                      <select
+                        className="form-control"
+                        value={newPatientData.bloodGroup}
+                        onChange={(e) => setNewPatientData({ ...newPatientData, bloodGroup: e.target.value })}
+                      >
+                        <option value="O+">O+ (Universal Donor)</option>
+                        <option value="A+">A+</option>
+                        <option value="B+">B+</option>
+                        <option value="AB+">AB+</option>
+                        <option value="O-">O-</option>
+                        <option value="A-">A-</option>
+                        <option value="B-">B-</option>
+                        <option value="AB-">AB-</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Date of Birth / Age</label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        value={newPatientData.dateOfBirth}
+                        onChange={(e) => setNewPatientData({ ...newPatientData, dateOfBirth: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="form-group">
                 <label>Select Attending Doctor</label>
