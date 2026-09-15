@@ -1,0 +1,22 @@
+# GitHub Linguist Language Configuration
+# Configure GitHub language detection to show Python as the primary repository language
+
+# Treat frontend UI, styling, and markup as vendored / non-detectable for language statistics
+frontend/** linguist-detectable=false
+frontend/** linguist-vendored=true
+*.jsx linguist-detectable=false
+*.jsx linguist-vendored=true
+*.js linguist-detectable=false
+*.js linguist-vendored=true
+*.css linguist-detectable=false
+*.css linguist-vendored=true
+*.html linguist-detectable=false
+*.html linguist-vendored=true
+*.json linguist-detectable=false
+*.json linguist-vendored=true
+terraform/** linguist-detectable=false
+terraform/** linguist-vendored=true
+
+# Ensure Python is detected as the primary core language
+*.py linguist-detectable=true
+backend/** linguist-detectable=true
