@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_, not_
+from sqlalchemy import or_
 from app.database import get_db
 from app import models
 from app.auth import get_current_user
@@ -18,12 +18,11 @@ def get_notifications(db: Session = Depends(get_db), current_user: models.User =
         doc_app_ids = [a.id for a in db.query(models.Appointment.id).filter(models.Appointment.doctorId == doc.id).all()] if doc else []
         
         # Strict isolation: Only return notifications explicitly belonging to this doctor user or their appointment entity IDs
-        query = db.query(models.Notification).filter(
-            or_(
-                models.Notification.userId == user_id,
-                models.Notification.entityId.in_(doc_app_ids) if doc_app_ids else False
-            )
-        )
+        clauses = [models.Notification.userId == user_id]
+        if doc_app_ids:
+            clauses.append(models.Notification.entityId.in_(doc_app_ids))
+
+        query = db.query(models.Notification).filter(or_(*clauses))
     else:
         query = db.query(models.Notification).filter(
             or_(models.Notification.role == role, models.Notification.userId == user_id)
@@ -63,7 +62,7 @@ def mark_notification_read(id: str, db: Session = Depends(get_db), current_user:
     if not notif:
         raise HTTPException(status_code=404, detail={"success": False, "message": "Notification not found"})
 
-    notif.isRead = True
+    setattr(notif, "isRead", True)
     db.commit()
 
     return {
@@ -83,12 +82,15 @@ def mark_all_read(db: Session = Depends(get_db), current_user: models.User = Dep
         doc = db.query(models.Doctor).filter(models.Doctor.userId == user_id).first()
         doc_app_ids = [a.id for a in db.query(models.Appointment.id).filter(models.Appointment.doctorId == doc.id).all()] if doc else []
         
+        clauses = [
+            models.Notification.userId == user_id,
+            models.Notification.role == "DOCTOR"
+        ]
+        if doc_app_ids:
+            clauses.append(models.Notification.entityId.in_(doc_app_ids))
+
         db.query(models.Notification).filter(
-            or_(
-                models.Notification.userId == user_id,
-                models.Notification.entityId.in_(doc_app_ids) if doc_app_ids else False,
-                models.Notification.role == "DOCTOR"
-            ),
+            or_(*clauses),
             models.Notification.isRead == False
         ).update({"isRead": True}, synchronize_session=False)
     else:
