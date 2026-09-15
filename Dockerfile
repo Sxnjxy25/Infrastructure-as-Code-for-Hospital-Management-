@@ -1,23 +1,24 @@
-# Root Dockerfile — builds the Backend REST API for Render.com deployment
-FROM node:18-slim
-
-# Install OpenSSL (required by Prisma)
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+# Root Dockerfile for Python FastAPI HMS Full-Stack Deployment
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy backend source
-COPY backend/package*.json ./
-COPY backend/prisma ./prisma/
+# Install system dependencies
+RUN apt-get update -y && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
 
-RUN npm ci
-RUN npx prisma generate
+# Copy backend requirements & install
+COPY backend/requirements.txt ./backend/
+RUN pip install --no-cache-dir -r ./backend/requirements.txt
 
-COPY backend/src ./src/
+# Copy entire repository
+COPY . .
+
+# Initialize database seed
+RUN python -m backend.app.seed || python backend/app/seed.py || true
 
 ENV NODE_ENV=production
 ENV PORT=5000
 
 EXPOSE 5000
 
-CMD ["node", "src/server.js"]
+CMD ["python", "backend/run.py"]

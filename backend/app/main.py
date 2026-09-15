@@ -1,8 +1,10 @@
+import os
 import time
 from datetime import datetime
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database import engine, Base
 from app.seed import seed_database
@@ -13,7 +15,7 @@ from app.routers import (
 
 start_time = time.time()
 
-# Ensure tables are created at startup
+# Ensure database tables are created at startup
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -41,7 +43,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register Routers
+# Register API Routers
 app.include_router(auth.router)
 app.include_router(departments.router)
 app.include_router(staff.router)
@@ -76,3 +78,39 @@ def trigger_seed():
             status_code=500,
             content={"success": False, "message": str(e)}
         )
+
+# Frontend SPA Static Files & Fallback Routing
+frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
+assets_dir = os.path.join(frontend_dist, "assets")
+
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="static_assets")
+
+@app.get("/{full_path:path}")
+def serve_spa_frontend(full_path: str):
+    # Do not intercept API or docs routes
+    if (
+        full_path.startswith("api/")
+        or full_path == "api"
+        or full_path.startswith("docs")
+        or full_path.startswith("redoc")
+        or full_path == "openapi.json"
+    ):
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+
+    if os.path.exists(frontend_dist):
+        file_path = os.path.join(frontend_dist, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        index_file = os.path.join(frontend_dist, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "UP",
+            "message": "Hospital Management System Python API is running. Build frontend with 'npm run build' or access http://localhost:3000.",
+            "docs": "/docs"
+        }
+    )
