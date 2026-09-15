@@ -17,20 +17,11 @@ def get_notifications(db: Session = Depends(get_db), current_user: models.User =
         doc = db.query(models.Doctor).filter(models.Doctor.userId == user_id).first()
         doc_app_ids = [a.id for a in db.query(models.Appointment.id).filter(models.Appointment.doctorId == doc.id).all()] if doc else []
         
-        # Get names of other doctors to filter out unrelated broadcasts
-        other_doctors = db.query(models.User.name).filter(models.User.role == "DOCTOR", models.User.id != user_id).all()
-        other_names = [d[0] for d in other_doctors]
-
-        # Doctor queries: notifications explicitly for this user, OR matching doctor appointment IDs, OR general doctor role not mentioning another doctor
+        # Strict isolation: Only return notifications explicitly belonging to this doctor user or their appointment entity IDs
         query = db.query(models.Notification).filter(
             or_(
                 models.Notification.userId == user_id,
-                models.Notification.entityId.in_(doc_app_ids) if doc_app_ids else False,
-                and_(
-                    models.Notification.role == "DOCTOR",
-                    models.Notification.userId == None,
-                    *[not_(models.Notification.message.ilike(f"%{name}%")) for name in other_names]
-                )
+                models.Notification.entityId.in_(doc_app_ids) if doc_app_ids else False
             )
         )
     else:
