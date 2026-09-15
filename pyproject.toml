@@ -1,0 +1,18 @@
+[tool.pyright]
+include = ["backend", "backend/app"]
+extraPaths = [
+    "backend",
+    "backend/app",
+    "C:\\Users\\Student\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages"
+]
+pythonPath = "C:\\Users\\Student\\AppData\\Local\\Programs\\Python\\Python314\\python.exe"
+reportMissingImports = false
+reportMissingModuleSource = false
+
+[tool.pylance]
+pythonPath = "C:\\Users\\Student\\AppData\\Local\\Programs\\Python\\Python314\\python.exe"
+extraPaths = [
+    "backend",
+    "backend/app",
+    "C:\\Users\\Student\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages"
+]
