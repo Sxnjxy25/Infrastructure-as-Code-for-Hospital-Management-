@@ -257,8 +257,9 @@ def quick_book_public_appointment(
     create_notification(
         db=db,
         role="RECEPTIONIST",
+        user_id=None,
         title="New Direct Appointment Token",
-        message=f"Token #{token_number} assigned for Dr. {target_doctor.user.name} to {patient.firstName} {patient.lastName}.",
+        message=f"Token #{token_number} assigned for {target_doctor.user.name if target_doctor.user else 'Doctor'} to {patient.firstName} {patient.lastName}.",
         type="APPOINTMENT",
         entity_id=appointment.id
     )

@@ -102,14 +102,28 @@ def run_tests():
 
     # 12. Quick Booking
     status, res = make_request("/api/appointments/quick-book", method="POST", data={
-        "patientName": "Dwight Schrute",
+        "patientName": "Dwight Schrute (Automated Test)",
         "phone": "+1-555-0444",
         "doctorName": "Dr. Sarah Smith",
         "timeSlot": "11:00 AM - 11:30 AM",
-        "reason": "Beet farming allergy consultation"
+        "reason": "Automated verification test appointment"
     })
+    test_app_id = res.get("data", {}).get("id")
     passed = status == 200 and res.get("success") == True and "tokenNumber" in res.get("data", {})
     tests.append(("POST /api/appointments/quick-book (Walk-in Booking)", status, passed))
+
+    # Clean up test appointment so database remains clean
+    if test_app_id:
+        try:
+            from backend.app.database import SessionLocal
+            from backend.app import models
+            _db = SessionLocal()
+            _db.query(models.Notification).filter(models.Notification.entityId == test_app_id).delete(synchronize_session=False)
+            _db.query(models.Appointment).filter(models.Appointment.id == test_app_id).delete(synchronize_session=False)
+            _db.commit()
+            _db.close()
+        except Exception:
+            pass
 
     # Output Results
     print(f"{'Endpoint / Test Case':<45} | {'HTTP Code':<10} | {'Result':<10}")
