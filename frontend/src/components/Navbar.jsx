@@ -89,15 +89,19 @@ const Navbar = () => {
     const slotMatch = message.match(/for\s+((?:\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)(?:\s*-\s*\d{1,2}:\d{2}\s*(?:AM|PM|am|pm))?)|(?:Scheduled\s*time))/i);
     const slot = slotMatch ? slotMatch[1].trim() : null;
 
-    // Extract patient name
     let patientName = null;
-    const bookedByMatch = message.match(/booked\s+(?:by|for)\s+([A-Za-z\s.]+?)(?:\s*\(\+?[\d\s-]+\)|\s+for\s+|\s*\.|$)/i);
-    if (bookedByMatch && bookedByMatch[1]) {
-      patientName = bookedByMatch[1].trim();
+    let reasonOrDoctor = null;
+
+    // Pattern 1: "Patient <Name> booked for <Reason>."
+    const patPrefixMatch = message.match(/Patient\s+([A-Za-z\s.]+?)\s+booked\s+for\s+([^.]+)/i);
+    if (patPrefixMatch) {
+      patientName = patPrefixMatch[1].trim();
+      reasonOrDoctor = patPrefixMatch[2].trim();
     } else {
-      const patPrefixMatch = message.match(/Patient\s+([A-Za-z\s.]+?)\s+booked/i);
-      if (patPrefixMatch && patPrefixMatch[1]) {
-        patientName = patPrefixMatch[1].trim();
+      // Pattern 2: "Token #104 booked by <Name> (<Phone>) for <Slot>"
+      const bookedByMatch = message.match(/booked\s+(?:by|for)\s+([A-Za-z\s.]+?)(?:\s*\(\+?[\d\s-]+\)|\s+for\s+|\s+with\s+|\s*\.|$)/i);
+      if (bookedByMatch && bookedByMatch[1]) {
+        patientName = bookedByMatch[1].trim();
       } else {
         const assignedToMatch = message.match(/to\s+([A-Za-z\s.]+?)\.?$/i);
         if (assignedToMatch && assignedToMatch[1]) {
@@ -106,19 +110,13 @@ const Navbar = () => {
       }
     }
 
-    // Extract doctor / reason
-    let doctorOrReason = null;
-    const drMatch = message.match(/Dr\.\s*([A-Za-z\s]+?)(?:\s+to|\.|$)/i);
+    // Extract doctor if mentioned with "with <Doctor>" or "assigned for <Doctor>"
+    const drMatch = message.match(/(?:with|assigned for)\s+Dr\.\s*([A-Za-z\s]+?)(?:\s+to|\s+for|\.|$)/i);
     if (drMatch) {
-      doctorOrReason = `Dr. ${drMatch[1].trim()}`;
-    } else {
-      const reasonMatch = message.match(/for\s+(?:Routine\s+)?([A-Za-z\s]+Consultation|[A-Za-z\s]+Checkup|[A-Za-z\s]+Exam)/i);
-      if (reasonMatch) {
-        doctorOrReason = reasonMatch[1].trim();
-      }
+      reasonOrDoctor = `Dr. ${drMatch[1].trim()}`;
     }
 
-    const isStructured = Boolean(token || patientName || slot || phone);
+    const isStructured = Boolean(token || patientName || slot || phone || reasonOrDoctor);
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%' }}>
@@ -156,26 +154,26 @@ const Navbar = () => {
           }}>
             {patientName && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ color: 'var(--text-muted)', minWidth: '55px' }}>Patient:</span>
+                <span style={{ color: 'var(--text-muted)', minWidth: '60px' }}>Patient:</span>
                 <strong style={{ color: 'var(--text-primary)' }}>{patientName}</strong>
               </div>
             )}
             {slot && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ color: 'var(--text-muted)', minWidth: '55px' }}>Time Slot:</span>
+                <span style={{ color: 'var(--text-muted)', minWidth: '60px' }}>Time Slot:</span>
                 <strong style={{ color: '#0284c7' }}>{slot}</strong>
               </div>
             )}
             {phone && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ color: 'var(--text-muted)', minWidth: '55px' }}>Contact:</span>
+                <span style={{ color: 'var(--text-muted)', minWidth: '60px' }}>Contact:</span>
                 <span style={{ color: 'var(--text-primary)' }}>{phone}</span>
               </div>
             )}
-            {doctorOrReason && (
+            {reasonOrDoctor && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ color: 'var(--text-muted)', minWidth: '55px' }}>Details:</span>
-                <span style={{ color: 'var(--text-primary)' }}>{doctorOrReason}</span>
+                <span style={{ color: 'var(--text-muted)', minWidth: '60px' }}>Details:</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{reasonOrDoctor}</span>
               </div>
             )}
           </div>
@@ -193,6 +191,21 @@ const Navbar = () => {
       </div>
     );
   };
+
+  // Filter personalized notifications for the logged-in doctor
+  const displayedNotifications = notifications.filter(n => {
+    if (user?.role !== 'DOCTOR') return true;
+    const msg = (n.message || '').toLowerCase();
+    const myName = (user.name || '').toLowerCase().replace('dr.', '').trim();
+    
+    // Filter out alerts explicitly destined for other doctors
+    if (myName.includes('smith') && (msg.includes('patel') || msg.includes('neurology'))) return false;
+    if (myName.includes('patel') && (msg.includes('smith') || msg.includes('cardiology'))) return false;
+    
+    return true;
+  });
+
+  const displayedUnreadCount = displayedNotifications.filter(n => !n.isRead).length;
 
   return (
     <div className="navbar">
@@ -223,7 +236,7 @@ const Navbar = () => {
             title="Notifications"
           >
             <Bell size={18} />
-            {unreadCount > 0 && (
+            {displayedUnreadCount > 0 && (
               <span style={{
                 position: 'absolute',
                 top: '-2px',
@@ -238,7 +251,7 @@ const Navbar = () => {
                 textAlign: 'center',
                 boxShadow: '0 2px 6px rgba(220, 38, 38, 0.4)'
               }}>
-                {unreadCount}
+                {displayedUnreadCount}
               </span>
             )}
           </button>
@@ -268,9 +281,9 @@ const Navbar = () => {
                 background: 'var(--bg-canvas-subtle)'
               }}>
                 <div style={{ fontWeight: 800, fontSize: '0.88rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Alerts & Notifications {unreadCount > 0 && <span style={{ color: 'var(--accent-emerald)', marginLeft: '4px' }}>({unreadCount} unread)</span>}
+                  {user?.role === 'DOCTOR' ? `${user?.name} Alerts` : 'Alerts & Notifications'} {displayedUnreadCount > 0 && <span style={{ color: 'var(--accent-emerald)', marginLeft: '4px' }}>({displayedUnreadCount} unread)</span>}
                 </div>
-                {unreadCount > 0 && (
+                {displayedUnreadCount > 0 && (
                   <button
                     onClick={handleMarkAllRead}
                     style={{
@@ -291,12 +304,12 @@ const Navbar = () => {
               </div>
 
               <div style={{ overflowY: 'auto', flex: 1, maxHeight: '420px' }}>
-                {notifications.length === 0 ? (
+                {displayedNotifications.length === 0 ? (
                   <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                    No alerts in queue.
+                    No alerts for {user?.name || 'your profile'}.
                   </div>
                 ) : (
-                  notifications?.map((n) => (
+                  displayedNotifications?.map((n) => (
                     <div
                       key={n.id}
                       style={{

@@ -139,12 +139,16 @@ def create_appointment(
 
     pat = db.query(models.Patient).filter(models.Patient.id == req.patientId).first()
     pat_name = f"{pat.firstName} {pat.lastName}" if pat else "Patient"
+    doc = db.query(models.Doctor).filter(models.Doctor.id == req.doctorId).first()
+    doc_user_id = doc.userId if doc else None
+    doc_name = f"{doc.user.name}" if (doc and doc.user) else "Doctor"
 
     create_notification(
         db=db,
         role="DOCTOR",
+        user_id=doc_user_id,
         title="New Appointment Scheduled",
-        message=f"Token #{token_number} booked for {pat_name} ({req.channel}).",
+        message=f"Token #{token_number} booked for {pat_name} ({req.channel}) with {doc_name} for {req.reason or 'Consultation'}.",
         type="APPOINTMENT",
         entity_id=appointment.id
     )
@@ -243,8 +247,9 @@ def quick_book_public_appointment(
     create_notification(
         db=db,
         role="DOCTOR",
+        user_id=target_doctor.userId,
         title="New Online / Direct Slot Booked",
-        message=f"Token #{token_number} booked by {patient.firstName} {patient.lastName} ({req.phone}) for {req.timeSlot or 'Scheduled time'}.",
+        message=f"Token #{token_number} booked by {patient.firstName} {patient.lastName} ({req.phone}) for {req.timeSlot or 'Scheduled time'} with {target_doctor.user.name if target_doctor.user else 'Doctor'}.",
         type="APPOINTMENT",
         entity_id=appointment.id
     )
