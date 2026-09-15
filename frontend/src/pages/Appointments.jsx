@@ -646,13 +646,6 @@ const Appointments = () => {
             >
               Dr. Rajesh ({rajeshAppointments.length})
             </button>
-            <button
-              className={`btn btn-sm ${doctorPanelMode === 'ALL' ? 'btn-emerald' : 'btn-outline'}`}
-              onClick={() => setDoctorPanelMode('ALL')}
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
-            >
-              All Combined ({sortedAllAppointments.length})
-            </button>
           </div>
 
           <button className="btn btn-primary" onClick={() => setShowModal(true)}>
