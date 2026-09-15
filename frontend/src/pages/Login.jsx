@@ -21,9 +21,16 @@ const Login = () => {
     }
   };
 
-  const handleQuickRole = (roleEmail) => {
+  const handleQuickRole = async (roleEmail) => {
     setEmail(roleEmail);
     setPassword('password123');
+    setError('');
+    const result = await login(roleEmail, 'password123');
+    if (result.success) {
+      navigate('/dashboard');
+    } else {
+      setError(result.message || 'Login failed');
+    }
   };
 
   return (
@@ -87,12 +94,12 @@ const Login = () => {
             1-Click Demo Credentials:
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-            <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem' }} onClick={() => handleQuickRole('admin@hospital.com')}>Admin</button>
-            <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem' }} onClick={() => handleQuickRole('dr.smith@hospital.com')}>Doctor</button>
-            <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem' }} onClick={() => handleQuickRole('reception@hospital.com')}>Reception</button>
-            <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem' }} onClick={() => handleQuickRole('pharmacy@hospital.com')}>Pharmacy</button>
-            <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem' }} onClick={() => handleQuickRole('lab@hospital.com')}>Lab Tech</button>
-            <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem' }} onClick={() => handleQuickRole('billing@hospital.com')}>Accountant</button>
+            <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('admin@hospital.com')}>Admin</button>
+            <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('dr.smith@hospital.com')}>Doctor</button>
+            <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('reception@hospital.com')}>Reception</button>
+            <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('pharmacy@hospital.com')}>Pharmacy</button>
+            <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('lab@hospital.com')}>Lab Tech</button>
+            <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('billing@hospital.com')}>Accountant</button>
           </div>
         </div>
       </div>
