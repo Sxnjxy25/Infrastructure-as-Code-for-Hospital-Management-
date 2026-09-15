@@ -74,6 +74,126 @@ const Navbar = () => {
     }
   };
 
+  const parseNotificationDetails = (n) => {
+    const { title = '', message = '', createdAt } = n;
+
+    // Extract token number
+    const tokenMatch = message.match(/Token\s*#?(\d+)/i);
+    const token = tokenMatch ? tokenMatch[1] : null;
+
+    // Extract phone number
+    const phoneMatch = message.match(/(\+?\d[\d\s-]{7,}\d)/);
+    const phone = phoneMatch ? phoneMatch[1].trim() : null;
+
+    // Extract time slot (e.g., 11:00 AM - 11:30 AM or 10:30 AM)
+    const slotMatch = message.match(/for\s+((?:\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)(?:\s*-\s*\d{1,2}:\d{2}\s*(?:AM|PM|am|pm))?)|(?:Scheduled\s*time))/i);
+    const slot = slotMatch ? slotMatch[1].trim() : null;
+
+    // Extract patient name
+    let patientName = null;
+    const bookedByMatch = message.match(/booked\s+(?:by|for)\s+([A-Za-z\s.]+?)(?:\s*\(\+?[\d\s-]+\)|\s+for\s+|\s*\.|$)/i);
+    if (bookedByMatch && bookedByMatch[1]) {
+      patientName = bookedByMatch[1].trim();
+    } else {
+      const patPrefixMatch = message.match(/Patient\s+([A-Za-z\s.]+?)\s+booked/i);
+      if (patPrefixMatch && patPrefixMatch[1]) {
+        patientName = patPrefixMatch[1].trim();
+      } else {
+        const assignedToMatch = message.match(/to\s+([A-Za-z\s.]+?)\.?$/i);
+        if (assignedToMatch && assignedToMatch[1]) {
+          patientName = assignedToMatch[1].trim();
+        }
+      }
+    }
+
+    // Extract doctor / reason
+    let doctorOrReason = null;
+    const drMatch = message.match(/Dr\.\s*([A-Za-z\s]+?)(?:\s+to|\.|$)/i);
+    if (drMatch) {
+      doctorOrReason = `Dr. ${drMatch[1].trim()}`;
+    } else {
+      const reasonMatch = message.match(/for\s+(?:Routine\s+)?([A-Za-z\s]+Consultation|[A-Za-z\s]+Checkup|[A-Za-z\s]+Exam)/i);
+      if (reasonMatch) {
+        doctorOrReason = reasonMatch[1].trim();
+      }
+    }
+
+    const isStructured = Boolean(token || patientName || slot || phone);
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontWeight: 800, fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+            {title}
+          </span>
+          {token && (
+            <span style={{
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              background: 'rgba(5, 150, 105, 0.12)',
+              color: '#059669',
+              border: '1px solid rgba(5, 150, 105, 0.25)',
+              padding: '0.15rem 0.55rem',
+              borderRadius: '999px',
+              whiteSpace: 'nowrap'
+            }}>
+              Token #{token}
+            </span>
+          )}
+        </div>
+
+        {isStructured ? (
+          <div style={{
+            background: 'var(--bg-canvas-subtle)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '8px',
+            padding: '0.55rem 0.75rem',
+            fontSize: '0.78rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.3rem',
+            color: 'var(--text-secondary)'
+          }}>
+            {patientName && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ color: 'var(--text-muted)', minWidth: '55px' }}>Patient:</span>
+                <strong style={{ color: 'var(--text-primary)' }}>{patientName}</strong>
+              </div>
+            )}
+            {slot && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ color: 'var(--text-muted)', minWidth: '55px' }}>Time Slot:</span>
+                <strong style={{ color: '#0284c7' }}>{slot}</strong>
+              </div>
+            )}
+            {phone && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ color: 'var(--text-muted)', minWidth: '55px' }}>Contact:</span>
+                <span style={{ color: 'var(--text-primary)' }}>{phone}</span>
+              </div>
+            )}
+            {doctorOrReason && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ color: 'var(--text-muted)', minWidth: '55px' }}>Details:</span>
+                <span style={{ color: 'var(--text-primary)' }}>{doctorOrReason}</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+            {message}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 600 }}>
+          <span>🕒 {new Date(createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          <span>•</span>
+          <span>{new Date(createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="navbar">
       <div>
@@ -128,19 +248,19 @@ const Navbar = () => {
               position: 'absolute',
               right: 0,
               top: '52px',
-              width: '380px',
-              maxHeight: '480px',
+              width: '410px',
+              maxHeight: '520px',
               background: '#ffffff',
               border: '1px solid var(--border-medium)',
-              borderRadius: '12px',
-              boxShadow: 'var(--shadow-elevated)',
+              borderRadius: '14px',
+              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.25)',
               zIndex: 1000,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column'
             }}>
               <div style={{
-                padding: '0.85rem 1.25rem',
+                padding: '0.95rem 1.25rem',
                 borderBottom: '1px solid var(--border-subtle)',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -148,7 +268,7 @@ const Navbar = () => {
                 background: 'var(--bg-canvas-subtle)'
               }}>
                 <div style={{ fontWeight: 800, fontSize: '0.88rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Notifications {unreadCount > 0 && <span style={{ color: 'var(--accent-emerald)' }}>({unreadCount} unread)</span>}
+                  Alerts & Notifications {unreadCount > 0 && <span style={{ color: 'var(--accent-emerald)', marginLeft: '4px' }}>({unreadCount} unread)</span>}
                 </div>
                 {unreadCount > 0 && (
                   <button
@@ -162,7 +282,7 @@ const Navbar = () => {
                       fontWeight: 800,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.2rem'
+                      gap: '0.25rem'
                     }}
                   >
                     <CheckCheck size={14} /> Mark all read
@@ -170,9 +290,9 @@ const Navbar = () => {
                 )}
               </div>
 
-              <div style={{ overflowY: 'auto', flex: 1, maxHeight: '380px' }}>
+              <div style={{ overflowY: 'auto', flex: 1, maxHeight: '420px' }}>
                 {notifications.length === 0 ? (
-                  <div style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     No alerts in queue.
                   </div>
                 ) : (
@@ -180,29 +300,34 @@ const Navbar = () => {
                     <div
                       key={n.id}
                       style={{
-                        padding: '0.85rem 1.25rem',
+                        padding: '1rem 1.25rem',
                         borderBottom: '1px solid var(--border-subtle)',
-                        background: n.isRead ? '#ffffff' : 'var(--bg-canvas)',
+                        background: n.isRead ? '#ffffff' : 'rgba(16, 185, 129, 0.03)',
                         display: 'flex',
                         gap: '0.85rem',
                         alignItems: 'flex-start',
-                        transition: 'background 0.2s ease'
+                        transition: 'background 0.2s ease',
+                        borderLeft: n.isRead ? '3px solid transparent' : '3px solid var(--accent-emerald)'
                       }}
                     >
-                      <div style={{ marginTop: '2px' }}>
+                      <div style={{
+                        marginTop: '2px',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        background: 'var(--bg-canvas-subtle)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
                         {getNotificationIcon(n.type)}
                       </div>
+                      
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: n.isRead ? 600 : 800, fontSize: '0.88rem', color: 'var(--text-primary)' }}>
-                          {n.title}
-                        </div>
-                        <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                          {n.message}
-                        </div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 600 }}>
-                          {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
+                        {parseNotificationDetails(n)}
                       </div>
+
                       {!n.isRead && (
                         <button
                           onClick={(e) => handleMarkAsRead(n.id, e)}
@@ -211,7 +336,10 @@ const Navbar = () => {
                             border: 'none',
                             color: 'var(--text-muted)',
                             cursor: 'pointer',
-                            padding: '2px'
+                            padding: '4px',
+                            borderRadius: '4px',
+                            display: 'flex',
+                            alignItems: 'center'
                           }}
                           title="Mark as read"
                         >
