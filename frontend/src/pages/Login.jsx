@@ -97,7 +97,7 @@ const Login = () => {
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
             <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('admin@hospital.com')}>Admin</button>
-            <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer', borderColor: '#059669', color: '#059669', fontWeight: 700 }} onClick={() => setShowDoctorModal(true)}>Doctor</button>
+            <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => setShowDoctorModal(true)}>Doctor</button>
             <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('reception@hospital.com')}>Reception</button>
             <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('pharmacy@hospital.com')}>Pharmacy</button>
             <button type="button" disabled={loading} className="btn btn-outline" style={{ fontSize: '0.72rem', padding: '0.35rem 0.75rem', cursor: loading ? 'not-allowed' : 'pointer' }} onClick={() => handleQuickRole('lab@hospital.com')}>Lab Tech</button>
