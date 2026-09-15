@@ -15,12 +15,11 @@ A modern, role-based Enterprise Hospital Management System built for hospitals, 
 - **Central Pharmacy**: Medicine inventory, batch tracking, low-stock reorder thresholds, and prescription dispensing.
 - **Diagnostic Laboratory**: Pathology and lab test requisitions, normal value reference ranges, and verified lab test reports.
 - **Billing & Patient Accounts**: Invoicing, consultation charges, lab/pharmacy itemization, and payment telemetry.
-- **⚙️ Settings & Institutional Configuration** *(Newly Added)*:
+- **⚙️ Settings & Institutional Configuration** *(Newly Updated)*:
   - **Hospital Profile**: Institutional name, licensing/registration, emergency hotlines, timezone, and currency.
-  - **Account & Security**: User profile updates, password change, 2FA toggle, and session inactivity timeout.
-  - **Clinical & OPD Workflow**: Token number prefix, consultation duration, emergency queue jump, and weekend OPD operations.
-  - **Billing & Tariffs**: Standard GST/tax rates, base consultation fee, pharmacy stock alert thresholds, and auto-invoicing.
+  - **Account & Security**: User profile updates, password change, and staff credentials.
   - **Alerts & Notifications**: Real-time SMS and email triage alerts for critical vitals, patient reminders, and lab result alerts.
+  - **Security & RBAC**: Inactivity session timeout thresholds, password complexity policy, 2FA toggle, and audit logging.
   - **System & Backup Tools**: Live database telemetry, JSON data export snapshot, backup file restore, cache flush, and factory reset.
 
 ---
@@ -62,8 +61,9 @@ c:\Users\Student\hospital\
 ├── favicon.svg                 # CarePulse institutional icon
 ├── serve.py                    # Python SPA HTTP server with client-side route fallback
 ├── start-server.bat            # Windows batch script to launch the local server
+├── push-to-github.bat          # Windows batch script to push repository to GitHub
 ├── README.md                   # System documentation and guide
 └── assets\
-    ├── index-MR-jAyec.js       # Production application bundle with Settings module
+    ├── index-MR-jAyec.js       # Production application bundle with streamlined Settings
     └── index-DFdcLalt.css      # Editorial design system styling and theme tokens
 ```

@@ -433,45 +433,6 @@ const SettingsPage = () => {
     }
   });
 
-  // Workflow settings
-  const [workflow, setWorkflow] = b.useState(() => {
-    try {
-      const saved = localStorage.getItem("carepulse_settings_workflow");
-      return saved ? JSON.parse(saved) : {
-        tokenPrefix: "CP-OPD-",
-        slotDuration: "20",
-        openingTime: "08:00 AM",
-        closingTime: "08:00 PM",
-        emergencyThreshold: "85",
-        autoApprove: true,
-        allowWalkInQueueJump: true,
-        weekendOperations: true
-      };
-    } catch {
-      return {};
-    }
-  });
-
-  // Billing settings
-  const [billing, setBilling] = b.useState(() => {
-    try {
-      const saved = localStorage.getItem("carepulse_settings_billing");
-      return saved ? JSON.parse(saved) : {
-        taxRate: "12",
-        baseConsultationFee: "1200",
-        lowStockThreshold: "25",
-        autoInvoice: true,
-        enableBarcode: true,
-        cashPayment: true,
-        cardPayment: true,
-        upiPayment: true,
-        insuranceTPA: true
-      };
-    } catch {
-      return {};
-    }
-  });
-
   // Notifications settings
   const [notifications, setNotifications] = b.useState(() => {
     try {
@@ -521,18 +482,6 @@ const SettingsPage = () => {
     showToast("Hospital profile & clinic branding updated successfully!");
   };
 
-  const handleSaveWorkflow = (e) => {
-    e.preventDefault();
-    localStorage.setItem("carepulse_settings_workflow", JSON.stringify(workflow));
-    showToast("Clinical OPD workflows & scheduling rules updated!");
-  };
-
-  const handleSaveBilling = (e) => {
-    e.preventDefault();
-    localStorage.setItem("carepulse_settings_billing", JSON.stringify(billing));
-    showToast("Billing tariffs, taxes & pharmacy parameters saved!");
-  };
-
   const handleSaveNotifications = (e) => {
     e.preventDefault();
     localStorage.setItem("carepulse_settings_notifications", JSON.stringify(notifications));
@@ -574,8 +523,6 @@ const SettingsPage = () => {
   const exportDatabase = () => {
     const data = {
       hospitalInfo: hospital,
-      workflowConfig: workflow,
-      billingConfig: billing,
       securityConfig: security,
       hospitalDatabase: J,
       exportedAt: new Date().toISOString(),
@@ -602,14 +549,6 @@ const SettingsPage = () => {
           setHospital(parsed.hospitalInfo);
           localStorage.setItem("carepulse_settings_hospital", JSON.stringify(parsed.hospitalInfo));
         }
-        if (parsed.workflowConfig) {
-          setWorkflow(parsed.workflowConfig);
-          localStorage.setItem("carepulse_settings_workflow", JSON.stringify(parsed.workflowConfig));
-        }
-        if (parsed.billingConfig) {
-          setBilling(parsed.billingConfig);
-          localStorage.setItem("carepulse_settings_billing", JSON.stringify(parsed.billingConfig));
-        }
         showToast("Backup imported & configurations successfully restored!");
       } catch (err) {
         showToast("Invalid JSON backup file", "error");
@@ -628,8 +567,6 @@ const SettingsPage = () => {
   const resetDemoData = () => {
     if (window.confirm("Are you sure you want to reset all configurations to default hospital settings?")) {
       localStorage.removeItem("carepulse_settings_hospital");
-      localStorage.removeItem("carepulse_settings_workflow");
-      localStorage.removeItem("carepulse_settings_billing");
       localStorage.removeItem("carepulse_settings_notifications");
       localStorage.removeItem("carepulse_settings_security");
       showToast("Configurations reset to factory default values!");
@@ -637,11 +574,10 @@ const SettingsPage = () => {
     }
   };
 
+  // Only the requested tabs: Hospital Profile, My Account, Alerts & SMS, Security & RBAC, System & Backups
   const tabs = [
     { id: "hospital", label: "Hospital Profile", icon: ki },
     { id: "account", label: "My Account", icon: hf },
-    { id: "workflow", label: "Clinical & OPD", icon: Ks },
-    { id: "billing", label: "Billing & Tariffs", icon: Xs },
     { id: "notifications", label: "Alerts & SMS", icon: r1 },
     { id: "security", label: "Security & RBAC", icon: b1 },
     { id: "system", label: "System & Backups", icon: DatabaseSettingsIcon }
@@ -687,7 +623,7 @@ const SettingsPage = () => {
               }),
               r.jsx("p", {
                 style: { color: "var(--text-muted)", fontSize: "0.92rem", margin: 0 },
-                children: "Configure hospital branding, OPD workflows, tariffs, security policies, and backup data"
+                children: "Configure hospital branding, account credentials, security policies, and backup data"
               })
             ]
           }),
@@ -705,8 +641,6 @@ const SettingsPage = () => {
                 type: "button",
                 onClick: () => {
                   if (activeTab === "hospital") handleSaveHospital({ preventDefault: () => {} });
-                  else if (activeTab === "workflow") handleSaveWorkflow({ preventDefault: () => {} });
-                  else if (activeTab === "billing") handleSaveBilling({ preventDefault: () => {} });
                   else if (activeTab === "notifications") handleSaveNotifications({ preventDefault: () => {} });
                   else if (activeTab === "security") handleSaveSecurity({ preventDefault: () => {} });
                   else if (activeTab === "account") handleSaveAccount({ preventDefault: () => {} });
@@ -1162,239 +1096,7 @@ const SettingsPage = () => {
           ]
         }),
 
-      // Tab 3: Clinical & OPD Workflow
-      activeTab === "workflow" &&
-        r.jsxs("form", {
-          onSubmit: handleSaveWorkflow,
-          style: {
-            background: "var(--bg-surface)",
-            border: "1px solid var(--border-subtle)",
-            borderRadius: "var(--radius-md)",
-            padding: "1.75rem",
-            boxShadow: "var(--shadow-editorial)"
-          },
-          children: [
-            r.jsxs("div", {
-              style: { marginBottom: "1.5rem", paddingBottom: "1rem", borderBottom: "1px solid var(--border-subtle)" },
-              children: [
-                r.jsx("h3", { style: { margin: "0 0 0.35rem 0", fontSize: "1.15rem", fontWeight: 700 }, children: "Clinical & OPD Workflow Policies" }),
-                r.jsx("p", { style: { margin: 0, color: "var(--text-muted)", fontSize: "0.85rem" }, children: "Control token numbering, consultation durations, queueing, and triage thresholds" })
-              ]
-            }),
-            r.jsxs("div", {
-              style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.25rem" },
-              children: [
-                r.jsxs("div", {
-                  className: "form-group",
-                  children: [
-                    r.jsx("label", { style: { fontSize: "0.82rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }, children: "OPD Token Pass Number Prefix" }),
-                    r.jsx("input", {
-                      type: "text",
-                      className: "form-control",
-                      value: workflow.tokenPrefix,
-                      onChange: (e) => setWorkflow({ ...workflow, tokenPrefix: e.target.value })
-                    })
-                  ]
-                }),
-                r.jsxs("div", {
-                  className: "form-group",
-                  children: [
-                    r.jsx("label", { style: { fontSize: "0.82rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }, children: "Default Consultation Slot Duration" }),
-                    r.jsxs("select", {
-                      className: "form-control",
-                      value: workflow.slotDuration,
-                      onChange: (e) => setWorkflow({ ...workflow, slotDuration: e.target.value }),
-                      children: [
-                        r.jsx("option", { value: "15", children: "15 Minutes (Express OPD)" }),
-                        r.jsx("option", { value: "20", children: "20 Minutes (Standard Clinical)" }),
-                        r.jsx("option", { value: "30", children: "30 Minutes (Comprehensive Specialist)" }),
-                        r.jsx("option", { value: "45", children: "45 Minutes (Surgical Consultation)" }),
-                        r.jsx("option", { value: "60", children: "60 Minutes (Psychiatry / Deep Assessment)" })
-                      ]
-                    })
-                  ]
-                }),
-                r.jsxs("div", {
-                  className: "form-group",
-                  children: [
-                    r.jsx("label", { style: { fontSize: "0.82rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }, children: "OPD Shift Start Time" }),
-                    r.jsx("input", {
-                      type: "text",
-                      className: "form-control",
-                      value: workflow.openingTime,
-                      onChange: (e) => setWorkflow({ ...workflow, openingTime: e.target.value })
-                    })
-                  ]
-                }),
-                r.jsxs("div", {
-                  className: "form-group",
-                  children: [
-                    r.jsx("label", { style: { fontSize: "0.82rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }, children: "OPD Shift End Time" }),
-                    r.jsx("input", {
-                      type: "text",
-                      className: "form-control",
-                      value: workflow.closingTime,
-                      onChange: (e) => setWorkflow({ ...workflow, closingTime: e.target.value })
-                    })
-                  ]
-                }),
-                r.jsxs("div", {
-                  className: "form-group",
-                  children: [
-                    r.jsx("label", { style: { fontSize: "0.82rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }, children: "Emergency Bed Alert Threshold (%)" }),
-                    r.jsx("input", {
-                      type: "number",
-                      min: "50",
-                      max: "98",
-                      className: "form-control",
-                      value: workflow.emergencyThreshold,
-                      onChange: (e) => setWorkflow({ ...workflow, emergencyThreshold: e.target.value })
-                    })
-                  ]
-                })
-              ]
-            }),
-            r.jsxs("div", {
-              style: { marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.9rem" },
-              children: [
-                r.jsxs("label", {
-                  style: { display: "flex", alignItems: "center", gap: "0.75rem", cursor: "pointer", fontSize: "0.9rem" },
-                  children: [
-                    r.jsx("input", {
-                      type: "checkbox",
-                      checked: workflow.autoApprove,
-                      onChange: (e) => setWorkflow({ ...workflow, autoApprove: e.target.checked })
-                    }),
-                    r.jsx("span", { children: "Auto-approve appointment slots requested by registered patients" })
-                  ]
-                }),
-                r.jsxs("label", {
-                  style: { display: "flex", alignItems: "center", gap: "0.75rem", cursor: "pointer", fontSize: "0.9rem" },
-                  children: [
-                    r.jsx("input", {
-                      type: "checkbox",
-                      checked: workflow.allowWalkInQueueJump,
-                      onChange: (e) => setWorkflow({ ...workflow, allowWalkInQueueJump: e.target.checked })
-                    }),
-                    r.jsx("span", { children: "Allow emergency walk-in cases to bypass regular outpatient queues" })
-                  ]
-                }),
-                r.jsxs("label", {
-                  style: { display: "flex", alignItems: "center", gap: "0.75rem", cursor: "pointer", fontSize: "0.9rem" },
-                  children: [
-                    r.jsx("input", {
-                      type: "checkbox",
-                      checked: workflow.weekendOperations,
-                      onChange: (e) => setWorkflow({ ...workflow, weekendOperations: e.target.checked })
-                    }),
-                    r.jsx("span", { children: "Enable weekend OPD operational schedule (Saturday & Sunday)" })
-                  ]
-                })
-              ]
-            }),
-            r.jsx("div", {
-              style: { marginTop: "1.75rem", display: "flex", justifyContent: "flex-end" },
-              children: r.jsx("button", { type: "submit", className: "btn btn-primary", children: "Save Clinical Workflows" })
-            })
-          ]
-        }),
-
-      // Tab 4: Billing & Pharmacy
-      activeTab === "billing" &&
-        r.jsxs("form", {
-          onSubmit: handleSaveBilling,
-          style: {
-            background: "var(--bg-surface)",
-            border: "1px solid var(--border-subtle)",
-            borderRadius: "var(--radius-md)",
-            padding: "1.75rem",
-            boxShadow: "var(--shadow-editorial)"
-          },
-          children: [
-            r.jsxs("div", {
-              style: { marginBottom: "1.5rem", paddingBottom: "1rem", borderBottom: "1px solid var(--border-subtle)" },
-              children: [
-                r.jsx("h3", { style: { margin: "0 0 0.35rem 0", fontSize: "1.15rem", fontWeight: 700 }, children: "Pharmacy & Billing Tariffs" }),
-                r.jsx("p", { style: { margin: 0, color: "var(--text-muted)", fontSize: "0.85rem" }, children: "Taxation schedules, base consultation rates, and inventory reorder alerts" })
-              ]
-            }),
-            r.jsxs("div", {
-              style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.25rem" },
-              children: [
-                r.jsxs("div", {
-                  className: "form-group",
-                  children: [
-                    r.jsx("label", { style: { fontSize: "0.82rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }, children: "Standard GST / Tax Rate (%)" }),
-                    r.jsx("input", {
-                      type: "number",
-                      step: "0.1",
-                      className: "form-control",
-                      value: billing.taxRate,
-                      onChange: (e) => setBilling({ ...billing, taxRate: e.target.value })
-                    })
-                  ]
-                }),
-                r.jsxs("div", {
-                  className: "form-group",
-                  children: [
-                    r.jsx("label", { style: { fontSize: "0.82rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }, children: "Base OPD Consultation Fee" }),
-                    r.jsx("input", {
-                      type: "number",
-                      className: "form-control",
-                      value: billing.baseConsultationFee,
-                      onChange: (e) => setBilling({ ...billing, baseConsultationFee: e.target.value })
-                    })
-                  ]
-                }),
-                r.jsxs("div", {
-                  className: "form-group",
-                  children: [
-                    r.jsx("label", { style: { fontSize: "0.82rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }, children: "Pharmacy Low-Stock Warning Threshold (Units)" }),
-                    r.jsx("input", {
-                      type: "number",
-                      className: "form-control",
-                      value: billing.lowStockThreshold,
-                      onChange: (e) => setBilling({ ...billing, lowStockThreshold: e.target.value })
-                    })
-                  ]
-                })
-              ]
-            }),
-            r.jsxs("div", {
-              style: { marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.9rem" },
-              children: [
-                r.jsxs("label", {
-                  style: { display: "flex", alignItems: "center", gap: "0.75rem", cursor: "pointer", fontSize: "0.9rem" },
-                  children: [
-                    r.jsx("input", {
-                      type: "checkbox",
-                      checked: billing.autoInvoice,
-                      onChange: (e) => setBilling({ ...billing, autoInvoice: e.target.checked })
-                    }),
-                    r.jsx("span", { children: "Automatically generate invoice on clinical consultation conclusion" })
-                  ]
-                }),
-                r.jsxs("label", {
-                  style: { display: "flex", alignItems: "center", gap: "0.75rem", cursor: "pointer", fontSize: "0.9rem" },
-                  children: [
-                    r.jsx("input", {
-                      type: "checkbox",
-                      checked: billing.enableBarcode,
-                      onChange: (e) => setBilling({ ...billing, enableBarcode: e.target.checked })
-                    }),
-                    r.jsx("span", { children: "Enable printable token pass barcode & QR verification on bills" })
-                  ]
-                })
-              ]
-            }),
-            r.jsx("div", {
-              style: { marginTop: "1.75rem", display: "flex", justifyContent: "flex-end" },
-              children: r.jsx("button", { type: "submit", className: "btn btn-primary", children: "Save Billing Tariffs" })
-            })
-          ]
-        }),
-
-      // Tab 5: Alerts & Notifications
+      // Tab 3: Alerts & Notifications
       activeTab === "notifications" &&
         r.jsxs("form", {
           onSubmit: handleSaveNotifications,
@@ -1480,7 +1182,7 @@ const SettingsPage = () => {
           ]
         }),
 
-      // Tab 6: Security & RBAC
+      // Tab 4: Security & RBAC
       activeTab === "security" &&
         r.jsxs("form", {
           onSubmit: handleSaveSecurity,
@@ -1571,7 +1273,7 @@ const SettingsPage = () => {
           ]
         }),
 
-      // Tab 7: System & Maintenance
+      // Tab 5: System & Maintenance
       activeTab === "system" &&
         r.jsxs("div", {
           style: { display: "flex", flexDirection: "column", gap: "1.5rem" },
