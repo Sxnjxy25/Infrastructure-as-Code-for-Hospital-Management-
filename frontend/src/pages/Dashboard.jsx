@@ -301,13 +301,6 @@ const Dashboard = () => {
           {/* View Filter Switcher */}
           <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.04)', padding: '0.25rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', gap: '0.25rem' }}>
             <button
-              className={`btn btn-sm ${doctorPanelMode === 'SPLIT' ? 'btn-emerald' : 'btn-outline'}`}
-              onClick={() => setDoctorPanelMode('SPLIT')}
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
-            >
-              Two Panels (Split View)
-            </button>
-            <button
               className={`btn btn-sm ${doctorPanelMode === 'SARAH' ? 'btn-emerald' : 'btn-outline'}`}
               onClick={() => setDoctorPanelMode('SARAH')}
               style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
