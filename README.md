@@ -34,17 +34,6 @@ py start_project.py
 
 ---
 
-## 🌐 Endpoints & Ports
-
-| Service | URL | Description |
-| :--- | :--- | :--- |
-| **Unified Web App** | [http://localhost:5000](http://localhost:5000) | Full Hospital Web UI served directly by FastAPI |
-| **React Dev Server** | [http://localhost:3000](http://localhost:3000) | Vite Frontend with Hot Module Replacement (HMR) |
-| **Backend REST API** | [http://localhost:5000/api/health](http://localhost:5000/api/health) | Health check & system status |
-| **Interactive API Docs** | [http://localhost:5000/docs](http://localhost:5000/docs) | Swagger UI for exploring and testing API endpoints |
-
----
-
 ## 🔑 Demo Login Credentials
 
 Password for all accounts: **`password123`**
